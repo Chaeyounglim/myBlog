@@ -35,6 +35,7 @@ public class PostService {
         return new PostResponseDto(post);
     }
 
+
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto) {
         Post post = checkPassword(id,postRequestDto.getPassword());
@@ -42,8 +43,8 @@ public class PostService {
         return new PostResponseDto(post);
     }
 
-    public boolean deletePost(Long id, PostRequestDto postRequestDto) {
-        Post post = checkPassword(id,postRequestDto.getPassword());
+    public boolean deletePost(Long id, String password) {
+        Post post = checkPassword(id,password);
         postRepository.delete(post);
         return !postRepository.existsById(id);
     }

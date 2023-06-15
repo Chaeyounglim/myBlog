@@ -45,7 +45,7 @@ public class PostController {
     // 선택한 게시글 삭제
     @DeleteMapping("/posts/{id}")
     public boolean deletePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto){
-        return postService.deletePost(id, postRequestDto);
+        return postService.deletePost(id, postRequestDto.getPassword());
     }
 
 }
