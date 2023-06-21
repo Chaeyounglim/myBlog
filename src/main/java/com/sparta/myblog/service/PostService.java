@@ -38,19 +38,31 @@ public class PostService {
 
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto) {
-        Post post = checkPassword(id,postRequestDto.getPassword());
-        post.update(postRequestDto);
+        Post post = findPost(id);
+        post = checkPassword(id, postRequestDto.getPassword());
+
+        if (!(post == null)) { // 해당 객체가 있을 경우
+            post.update(postRequestDto);
+        } else { // 해당 객체가 없을 경우
+            throw new IllegalArgumentException("비밀번호가 일치 하지 않습니다.");
+        }
         return new PostResponseDto(post);
     }
 
     public boolean deletePost(Long id, String password) {
-        Post post = checkPassword(id,password);
-        postRepository.delete(post);
+        Post post = findPost(id);
+        post = checkPassword(id, password);
+
+        if (!(post == null)) { // 해당 객체가 있을 경우
+            postRepository.delete(post);
+        } else { // 해당 객체가 없을 경우
+            throw new IllegalArgumentException("비밀번호가 일치 하지 않습니다.");
+        }
         return !postRepository.existsById(id);
     }
 
-    private Post checkPassword(Long id, String checkPassword) {
-        return postRepository.findPostByIdIsAndPasswordEquals(id,checkPassword);
+    private Post checkPassword(Long id, String inputPassword) {
+        return postRepository.findPostByIdIsAndPasswordEquals(id, inputPassword);
     }
 
     private Post findPost(Long id) {
