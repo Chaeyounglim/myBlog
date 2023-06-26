@@ -5,10 +5,13 @@ import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.security.UserDetailsImpl;
 import com.sparta.myblog.service.PostService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -25,30 +28,41 @@ public class PostController {
         return postService.getPostList();
     }
 
+
+
     // 선택한 게시글 상세 조회
     @GetMapping("/posts/{id}")
     public PostResponseDto getPost(@PathVariable Long id) {
         return postService.getPost(id);
     }
 
+
     // 게시글 작성
-/*    @PostMapping("/posts")
+    @PostMapping("/posts")
     public PostResponseDto createPost(
-            @RequestBody PostRequestDto postRequestDto,
-            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return postService.createPost(postRequestDto,userDetails.getUser());
-    }*/
+            @RequestBody PostRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.createPost(requestDto, userDetails.getUser());
+    }
+
 
     // 선택한 게시글 수정
     @PutMapping("/posts/{id}")
-    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto){
-        return postService.updatePost(id, postRequestDto);
+    public PostResponseDto updatePost(
+            @PathVariable Long id,
+            @RequestBody PostRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.updatePost(id, requestDto, userDetails.getUser());
     }
+
 
     // 선택한 게시글 삭제
     @DeleteMapping("/posts/{id}")
-    public boolean deletePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto){
-        return postService.deletePost(id, postRequestDto.getPassword());
+    public void deletePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            HttpServletResponse res) throws IOException {
+        postService.deletePost(res,id, userDetails.getUser());
     }
 
 }

@@ -20,7 +20,7 @@ public class Post extends Timestamped {
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "user_name", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false, length = 500)

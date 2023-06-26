@@ -5,10 +5,14 @@ import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
 import com.sparta.myblog.repository.PostRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -31,39 +35,42 @@ public class PostService {
 
 
     public PostResponseDto createPost(PostRequestDto requestDto, User user) {
+
         Post post = postRepository.save(new Post(requestDto,user));
         return new PostResponseDto(post);
     }
 
 
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto) {
-        Post post = findPost(id);
-        post = checkPassword(id, postRequestDto.getPassword());
+    public PostResponseDto updatePost(Long id, PostRequestDto requestDto, User user) {
 
-        if (!(post == null)) { // 해당 객체가 있을 경우
-            post.update(postRequestDto);
-        } else { // 해당 객체가 없을 경우
-            throw new IllegalArgumentException("비밀번호가 일치 하지 않습니다.");
+        // 1. 해당 게시글이 있는지 확인
+        Post post = this.findPost(id);
+
+        // 2. 해당 게시글의 작성자라면 수정하도록 함.
+        String postUsername = post.getUser().getUsername(); // 게시글의 작성자 이름
+        String loginUsername = user.getUsername(); // 로그인된 사용자 이름
+
+        if(postUsername.equals(loginUsername)){
+            post.update(requestDto);
         }
         return new PostResponseDto(post);
     }
 
-    public boolean deletePost(Long id, String password) {
-        Post post = findPost(id);
-        post = checkPassword(id, password);
+    public void deletePost(HttpServletResponse res, Long id, User user) throws IOException {
+        // 1. 해당 게시글이 있는지 확인
+        Post post = this.findPost(id);
 
-        if (!(post == null)) { // 해당 객체가 있을 경우
+        // 2. 해당 게시글의 작성자라면 수정하도록 함.
+        String postUsername = post.getUser().getUsername(); // 게시글의 작성자 이름
+        String loginUsername = user.getUsername(); // 로그인된 사용자 이름
+
+        if(postUsername.equals(loginUsername)){
             postRepository.delete(post);
-        } else { // 해당 객체가 없을 경우
-            throw new IllegalArgumentException("비밀번호가 일치 하지 않습니다.");
+            this.responseResult(res,200,"게시글 삭제 성공");
+        }else {
+            this.responseResult(res,401,"게시글 삭제 실패");
         }
-        return !postRepository.existsById(id);
-    }
-
-    private Post checkPassword(Long id, String inputPassword) {
-        //return postRepository.findPostByIdIsAndPasswordEquals(id, inputPassword);
-        return null;
     }
 
     private Post findPost(Long id) {
@@ -71,4 +78,16 @@ public class PostService {
                 new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
     }
 
+    private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
+        String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
+
+        // Content-Type 및 문자 인코딩 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // PrintWriter 를 사용하여 응답 데이터 전송
+        PrintWriter writer = response.getWriter();
+        writer.write(jsonResponse);
+        writer.flush();
+    }
 }
