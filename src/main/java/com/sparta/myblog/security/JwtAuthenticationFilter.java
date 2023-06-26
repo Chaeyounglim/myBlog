@@ -58,6 +58,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.getWriter().write("로그인 성공");*/
     }
 
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
+        responseResult(response, 401, "로그인 실패");
+    }
+
+
+    // Client 에 반환할 msg, status 세팅 메서드
     private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
         String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
 
@@ -69,11 +76,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         PrintWriter writer = response.getWriter();
         writer.write(jsonResponse);
         writer.flush();
-    }
-
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
-        responseResult(response, 401, "로그인 실패");
     }
 
 }
