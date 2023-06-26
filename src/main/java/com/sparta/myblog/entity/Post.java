@@ -16,30 +16,25 @@ public class Post extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "title")
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "user_name", nullable = false, unique = true)
+    private User user;
 
-    @Column(name = "contents", nullable = false, length = 500)
+    @Column(nullable = false, length = 500)
     private String contents;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    public Post(PostRequestDto postRequestDto) {
-        this.title = postRequestDto.getTitle();
-        this.name = postRequestDto.getName();
-        this.contents = postRequestDto.getContents();
-        this.password = postRequestDto.getPassword();
+    public Post(PostRequestDto requestDto, User user) {
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+        this.user = user;
     }
 
     public void update(PostRequestDto postRequestDto) {
         this.title = postRequestDto.getTitle();
-        this.name = postRequestDto.getName();
         this.contents = postRequestDto.getContents();
-        this.password = postRequestDto.getPassword();
     }
 
 }

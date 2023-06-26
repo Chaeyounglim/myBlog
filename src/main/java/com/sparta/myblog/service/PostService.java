@@ -3,6 +3,7 @@ package com.sparta.myblog.service;
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.entity.Post;
+import com.sparta.myblog.entity.User;
 import com.sparta.myblog.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +30,8 @@ public class PostService {
     }
 
 
-    public PostResponseDto createPost(PostRequestDto postRequestDto) {
-        Post post = new Post(postRequestDto);
-        Post savePost = postRepository.save(post);
+    public PostResponseDto createPost(PostRequestDto requestDto, User user) {
+        Post post = postRepository.save(new Post(requestDto,user));
         return new PostResponseDto(post);
     }
 
@@ -62,7 +62,8 @@ public class PostService {
     }
 
     private Post checkPassword(Long id, String inputPassword) {
-        return postRepository.findPostByIdIsAndPasswordEquals(id, inputPassword);
+        //return postRepository.findPostByIdIsAndPasswordEquals(id, inputPassword);
+        return null;
     }
 
     private Post findPost(Long id) {
