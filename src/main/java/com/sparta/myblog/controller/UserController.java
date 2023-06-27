@@ -1,7 +1,6 @@
 package com.sparta.myblog.controller;
 
 
-import com.sparta.myblog.dto.ResponseDto;
 import com.sparta.myblog.dto.UserRequestDto;
 import com.sparta.myblog.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,16 +29,17 @@ public class UserController {
     // 회원가입
     @PostMapping("/user/signup")
     public void signUp(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult, HttpServletResponse res) throws IOException {
-        // Validation 예외처리
+        // 1. Validation 예외처리
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         if (fieldErrors.size() > 0) {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
             }
+        }else {
+            // 2. userService 에서 signup 하고
+            // 3. HttpServletResponse 에 (msg, status set 하기)
+            userService.signUp(userRequestDto,res);
         }
-
-        // userService 에서 signup 하고, HttpServletResponse 를 반환 (msg, status set 해서)
-        userService.signUp(userRequestDto,res);
     }
 
 }

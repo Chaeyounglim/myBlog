@@ -25,7 +25,7 @@ public class PostService {
 
 
     public List<PostResponseDto> getPostList() {
-        return postRepository.findAllByOrderByCreateAtDesc().stream().map(PostResponseDto::new).toList();
+        return postRepository.findAllByOrderByCreatedAtDesc().stream().map(PostResponseDto::new).toList();
     }
 
     public PostResponseDto getPost(Long id) {
@@ -35,7 +35,6 @@ public class PostService {
 
 
     public PostResponseDto createPost(PostRequestDto requestDto, User user) {
-
         Post post = postRepository.save(new Post(requestDto,user));
         return new PostResponseDto(post);
     }
@@ -43,7 +42,6 @@ public class PostService {
 
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto requestDto, User user) {
-
         // 1. 해당 게시글이 있는지 확인
         Post post = this.findPost(id);
 
@@ -71,11 +69,12 @@ public class PostService {
         }else {
             this.responseResult(res,401,"게시글 삭제 실패");
         }
+
     }
 
     private Post findPost(Long id) {
         return postRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+                new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
     }
 
     private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
@@ -90,4 +89,6 @@ public class PostService {
         writer.write(jsonResponse);
         writer.flush();
     }
+
+
 }

@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Slf4j(topic = "JWT 검증 및 인가")
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -67,4 +68,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
+
+
+    // Client 에 반환할 msg, status 세팅 메서드
+    private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
+        String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
+
+        // Content-Type 및 문자 인코딩 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // PrintWriter 를 사용하여 응답 데이터 전송
+        PrintWriter writer = response.getWriter();
+        writer.write(jsonResponse);
+        writer.flush();
+    }
+
+
 }

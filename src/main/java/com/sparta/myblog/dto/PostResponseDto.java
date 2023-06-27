@@ -4,6 +4,7 @@ import com.sparta.myblog.entity.Post;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class PostResponseDto {
@@ -14,13 +15,14 @@ public class PostResponseDto {
     private String contents;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private List<CommentResponseDto> commentResponseDtoList;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.username = post.getUser().getUsername();
         this.contents = post.getContents();
-        this.createdAt = post.getCreateAt();
+        this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
     }
 }

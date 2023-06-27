@@ -23,6 +23,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
         setFilterProcessesUrl("/api/user/login");
+
     }
 
     @Override
@@ -53,14 +54,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // 응답 상태 코드와 메시지 설정
         responseResult(response, 200, "로그인 성공");
-
-        /*response.setStatus(200);
-        response.getWriter().write("로그인 성공");*/
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
-        responseResult(response, 401, "로그인 실패");
+        responseResult(response, 400, "회원을 찾을 수 없습니다.");
     }
 
 
