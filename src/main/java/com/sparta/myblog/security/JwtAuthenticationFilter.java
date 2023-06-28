@@ -8,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -20,14 +21,23 @@ import java.io.PrintWriter;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final JwtUtil jwtUtil;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil) {   
         this.jwtUtil = jwtUtil;
         setFilterProcessesUrl("/api/user/login");
-
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        if (!request.getMethod().equals(HttpMethod.POST.name())) {
+            // 해당 url 로 들어온 요청의 Method 가 POST 가 아니라면
+            try {
+                responseResult(response,400,"HTTP Method Error");
+                return null;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         try {
             UserRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), UserRequestDto.class);
 

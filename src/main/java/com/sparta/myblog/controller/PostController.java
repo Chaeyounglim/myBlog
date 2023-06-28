@@ -37,7 +37,7 @@ public class PostController {
 
 
     // 게시글 작성
-    @PostMapping("/posts")
+    @PostMapping("/post")
     public PostResponseDto createPost(
             @RequestBody PostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -46,7 +46,7 @@ public class PostController {
 
 
     // 선택한 게시글 수정
-    @PutMapping("/posts/{id}")
+    @PutMapping("/post/{id}")
     public PostResponseDto updatePost(
             @PathVariable Long id,
             @RequestBody PostRequestDto requestDto,
@@ -56,7 +56,7 @@ public class PostController {
 
 
     // 선택한 게시글 삭제
-    @DeleteMapping("/posts/{id}")
+    @DeleteMapping("/post/{id}")
     public void deletePost(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails,

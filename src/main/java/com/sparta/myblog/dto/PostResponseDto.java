@@ -1,12 +1,17 @@
 package com.sparta.myblog.dto;
 
+import com.sparta.myblog.entity.Comment;
 import com.sparta.myblog.entity.Post;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 public class PostResponseDto {
 
     private Long id;
@@ -24,5 +29,12 @@ public class PostResponseDto {
         this.contents = post.getContents();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
-    }
+        if(post.getCommentList().size()>0) {
+            this.commentResponseDtoList = new ArrayList<>();
+            for (Comment comment : post.getCommentList()) {
+                this.commentResponseDtoList.add(new CommentResponseDto(comment));
+            }
+        }// end of the if()
+    }// end of constructor method()
+
 }

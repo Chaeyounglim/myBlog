@@ -40,8 +40,9 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-//        post.addComment(comment);
+        post.addComment(comment);
 
+        log.info("댓글 저장 완료");
         return new CommentResponseDto(comment);
     }
 
@@ -51,15 +52,18 @@ public class CommentService {
         Comment comment = this.findComment(commentId);
 
         // 2. 댓글 작성자 이름 가져오기
-        String commentUsername = comment.getUser().getUsername();
+        Long commentUserId = comment.getUser().getId();
 
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
-        if(!commentUsername.equals(user.getUsername())) { // 작성자가 아닐 경우
-            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
-        }else { // 작성자가 맞을 경우
-            // 4. 해당 댓글 수정하기
-            comment.update(requestDto);
+        if(!commentUserId.equals(user.getId())) { // 작성자가 아닐 경우
+            log.error("댓글 작성자가 아닌 사용자가 댓글 수정 요청");
+            return null;
+            //throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }
+
+        // 4. 해당 댓글 수정하기
+        comment.update(requestDto);
+        log.info("댓글 수정 완료");
         return new CommentResponseDto(comment);
     }
 
@@ -68,15 +72,18 @@ public class CommentService {
         Comment comment = this.findComment(commentId);
 
         // 2. 댓글 작성자 이름 가져오기
-        String commentUsername = comment.getUser().getUsername();
+        Long commentUserId = comment.getUser().getId();
 
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
-        if(!commentUsername.equals(user.getUsername())) { // 작성자가 아닐 경우
-            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+        if(!commentUserId.equals(user.getId())) { // 작성자가 아닐 경우
+            log.error("댓글 작성자가 아닌 사용자가 댓글 삭제 요청");
+            responseResult(res,400,"댓글 삭제 실패 : 작성자가 아닙니다.");
+            //throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }else { // 작성자가 맞을 경우
             // 4. 해당 댓글 수정하기
             commentRepository.delete(comment);
             responseResult(res,200,"댓글 삭제 성공");
+            log.info("댓글 삭제 완료");
         }
     }
 

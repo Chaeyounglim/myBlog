@@ -23,7 +23,7 @@ public class Post extends Timestamped {
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "username", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false, length = 500)
@@ -38,9 +38,9 @@ public class Post extends Timestamped {
         this.user = user;
     }
 
-/*    public void addComment(Comment comment) {
+    public void addComment(Comment comment) {
         this.commentList.add(comment);
-    }*/
+    }
 
     public void update(PostRequestDto requestDto) {
         this.title = requestDto.getTitle();
