@@ -5,11 +5,14 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -52,7 +55,7 @@ public class JwtUtil {
     }
 
     // header 에서 JWT 가져오기
-    public String getJwtFromHeader(HttpServletRequest request) {
+    public String getJwtFromHeader(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
@@ -66,12 +69,16 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
+            log.error("Token Error : 토큰 검증 실패");
             log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
+            log.error("Token Error : 토큰 검증 실패");
             log.error("Expired JWT token, 만료된 JWT token 입니다.");
         } catch (UnsupportedJwtException e) {
+            log.error("Token Error : 토큰 검증 실패");
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
+            log.error("Token Error : 토큰 검증 실패");
             log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
         return false;
@@ -81,4 +88,20 @@ public class JwtUtil {
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
+
+
+    // Client 에 HttpServletResponse 를 통해 반환할 msg, status 세팅 메서드
+    private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
+        String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
+
+        // Content-Type 및 문자 인코딩 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // PrintWriter 를 사용하여 응답 데이터 전송
+        PrintWriter writer = response.getWriter();
+        writer.write(jsonResponse);
+        writer.flush();
+    }
+
 }

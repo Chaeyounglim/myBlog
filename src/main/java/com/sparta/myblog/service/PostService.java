@@ -2,7 +2,6 @@ package com.sparta.myblog.service;
 
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
-import com.sparta.myblog.entity.Comment;
 import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
 import com.sparta.myblog.repository.CommentRepository;

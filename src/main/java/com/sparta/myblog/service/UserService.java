@@ -32,7 +32,7 @@ public class UserService {
         // 2-1. DB에 해당 username 에 대한 row 가 있다면 checkUsername 변수에 저장.
         Optional<User> checkUsername = userRepository.findByUsername(username);
         if( checkUsername.isPresent() ) { // 2-2. 중복된 회원이 있을 경우
-            responseResult(res,400,"중복된 사용자가 있습니다.");
+            responseResult(res,400,"중복된 username 입니다.");
             log.error("중복된 사용자가 존재합니다.");
         }else { // 2-2. 중복된 회원이 없을 경우 가입 시도
             // 3. 사용자 ROLE 부여

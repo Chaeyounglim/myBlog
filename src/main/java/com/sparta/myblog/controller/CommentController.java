@@ -44,8 +44,9 @@ public class CommentController {
     public CommentResponseDto updateComment(
             @PathVariable Long comment_id,
             @RequestBody CommentRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return commentService.updateComment(comment_id,requestDto,userDetails.getUser());
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            HttpServletResponse response) throws IOException {
+        return commentService.updateComment(response,comment_id,requestDto,userDetails.getUser());
     }
 
 

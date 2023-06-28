@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        if (!request.getMethod().equals(HttpMethod.POST.name())) {
+        if (!request.getMethod().equals(HttpMethod.POST.name()) ) {
             // 해당 url 로 들어온 요청의 Method 가 POST 가 아니라면
             try {
                 responseResult(response,400,"HTTP Method Error");

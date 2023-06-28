@@ -47,7 +47,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto updateComment(Long commentId, CommentRequestDto requestDto, User user) {
+    public CommentResponseDto updateComment(HttpServletResponse response,Long commentId, CommentRequestDto requestDto, User user) throws IOException {
         // 1. 해당하는 댓글 가져오기
         Comment comment = this.findComment(commentId);
 
@@ -57,6 +57,7 @@ public class CommentService {
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
         if(!commentUserId.equals(user.getId())) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 수정 요청");
+            responseResult(response,400,"댓글 수정 실패 : 작성자만 삭제/수정할 수 있습니다.");
             return null;
             //throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }
@@ -77,7 +78,7 @@ public class CommentService {
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
         if(!commentUserId.equals(user.getId())) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 삭제 요청");
-            responseResult(res,400,"댓글 삭제 실패 : 작성자가 아닙니다.");
+            responseResult(res,400,"댓글 삭제 실패 : 작성자만 삭제/수정할 수 있습니다.");
             //throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
         }else { // 작성자가 맞을 경우
             // 4. 해당 댓글 수정하기
