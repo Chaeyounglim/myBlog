@@ -5,6 +5,7 @@ import com.sparta.myblog.dto.CommentResponseDto;
 import com.sparta.myblog.entity.Comment;
 import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
+import com.sparta.myblog.entity.UserRoleEnum;
 import com.sparta.myblog.repository.CommentRepository;
 import com.sparta.myblog.repository.PostRepository;
 import com.sparta.myblog.security.UserDetailsImpl;
@@ -55,7 +56,7 @@ public class CommentService {
         Long commentUserId = comment.getUser().getId();
 
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
-        if(!commentUserId.equals(user.getId())) { // 작성자가 아닐 경우
+        if(!commentUserId.equals(user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 수정 요청");
             responseResult(response,400,"댓글 수정 실패 : 작성자만 삭제/수정할 수 있습니다.");
             return null;
@@ -76,7 +77,7 @@ public class CommentService {
         Long commentUserId = comment.getUser().getId();
 
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
-        if(!commentUserId.equals(user.getId())) { // 작성자가 아닐 경우
+        if(!commentUserId.equals(user.getId()) || user.getRole().equals(UserRoleEnum.ADMIN) ) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 삭제 요청");
             responseResult(res,400,"댓글 삭제 실패 : 작성자만 삭제/수정할 수 있습니다.");
             //throw new IllegalArgumentException("댓글 작성자가 아닙니다.");

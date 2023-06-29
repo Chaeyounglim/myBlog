@@ -20,17 +20,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    //1. 댓글 수정 삭제 부분 - /api/post/{id}/comment/{id}
-    //id를 구분을 줘야 할거 같아요!
-    //
-    //
-    //2. 그리고 생각해보니까 저희 게시글 삭제할 때
-    //해당 게시글에 속한 댓글도 삭제하게끔 cascade 해줘야 할 것 같더라구요
-    //
-    //3. 아 참 댓글 작성, 수정 부분에서 response를 댓글 테이블에서
-    //id, 작성자, 작성일자, 수정일자, 내용 다 넘겨줘야 하지 않을까 싶어요!
-
-
     @PostMapping("/post/{post_id}/comment")
     public CommentResponseDto createComment(
             @PathVariable Long post_id,

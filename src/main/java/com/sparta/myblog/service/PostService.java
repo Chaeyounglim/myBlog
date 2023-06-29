@@ -4,6 +4,7 @@ import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
+import com.sparta.myblog.entity.UserRoleEnum;
 import com.sparta.myblog.repository.CommentRepository;
 import com.sparta.myblog.repository.PostRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -71,11 +72,12 @@ public class PostService {
         // 1-2. 해당 게시글이 있을 경우 실행
         Post post = this.findPost(id);
 
+        log.info("updatePost 접근");
         // 2. 해당 게시글의 작성자라면 수정하도록 함.
         Long inputId = post.getUser().getId(); // 게시글의 작성자 user_id
         Long loginId = user.getId(); // 로그인된 사용자 user_id
 
-        if(inputId.equals(loginId)){
+        if(inputId.equals(loginId) || user.getRole().equals(UserRoleEnum.ADMIN)){
             post.update(requestDto);
             log.info("게시글 수정 완료");
         }
@@ -96,7 +98,8 @@ public class PostService {
             Long inputId = post.getUser().getId();// 게시글의 user_id
             Long loginId = user.getId(); // 로그인된 user_id
 
-            if (inputId.equals(loginId)) {
+            log.info("deletePost 접근");
+            if (inputId.equals(loginId) || user.getRole().equals(UserRoleEnum.ADMIN)) {
                 postRepository.delete(post);
                 this.responseResult(res, 200, "게시글 삭제 성공");
                 log.info("게시글 삭제 완료");
