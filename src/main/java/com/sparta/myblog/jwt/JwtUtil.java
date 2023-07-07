@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -55,7 +54,7 @@ public class JwtUtil {
     }
 
     // header 에서 JWT 가져오기
-    public String getJwtFromHeader(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String getJwtFromHeader(HttpServletRequest request) throws IOException {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
@@ -87,21 +86,6 @@ public class JwtUtil {
     // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-    }
-
-
-    // Client 에 HttpServletResponse 를 통해 반환할 msg, status 세팅 메서드
-    private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
-        String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
-
-        // Content-Type 및 문자 인코딩 설정
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        // PrintWriter 를 사용하여 응답 데이터 전송
-        PrintWriter writer = response.getWriter();
-        writer.write(jsonResponse);
-        writer.flush();
     }
 
 }
