@@ -19,6 +19,8 @@ public class UserRequestDto {
     @NotBlank
     private String password;
 
+    private boolean admin = false;
+
     // admin 확인 토큰
     private String adminToken;
 

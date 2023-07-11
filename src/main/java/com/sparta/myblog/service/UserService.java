@@ -32,7 +32,7 @@ public class UserService {
         String password = passwordEncoder.encode(requestDto.getPassword());
         UserRoleEnum role = UserRoleEnum.USER;
 
-        log.info(requestDto.getAdminToken());
+        //log.info(requestDto.getAdminToken());
 
         // 2. 회원 중복 확인
         // 2-1. DB에 해당 username 에 대한 row 가 있다면 checkUsername 변수에 저장.
@@ -48,13 +48,15 @@ public class UserService {
         // 2-2. 중복된 회원이 없을 경우 가입 시도
 
         // 3. 사용자 ROLE 부여
-        if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
-            responseResult(res, 400, "관리자 암호가 아닙니다.");
-            log.error("관리자 암호가 틀려 등록이 불가능합니다.");
-            return;
-        } else {
-            role = UserRoleEnum.ADMIN;
-        } // end of the inner if~else()
+        if(requestDto.isAdmin()) {
+            if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
+                responseResult(res, 400, "관리자 암호가 아닙니다.");
+                log.error("관리자 암호가 틀려 등록이 불가능합니다.");
+                return;
+            } else {
+                role = UserRoleEnum.ADMIN;
+            } // end of the inner if~else()
+        }
 
         // 4. 해당 정보를 생성자 메서드로 User 객체 생성 후 DB 에 저장
         User user = new User(username, password, role);
