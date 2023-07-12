@@ -13,6 +13,7 @@ public class CommentResponseDto {
     private Long post_id;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private Long likeCnt;
 
     public CommentResponseDto(Comment comment) {
         this.id = comment.getId();
@@ -21,6 +22,7 @@ public class CommentResponseDto {
         this.post_id = comment.getPost().getId();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
+        this.likeCnt = comment.getLikeCnt();
     }
 
 }

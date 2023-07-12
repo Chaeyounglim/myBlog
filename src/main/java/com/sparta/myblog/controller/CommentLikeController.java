@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class CommentLikeController {
 
-    private CommentLikeService commentLikeService;
+    private final CommentLikeService commentLikeService;
 
     @PostMapping("comment/{comment_id}/like")
     public ResponseEntity<RestApiResponseDto> increaseLike(
@@ -24,7 +24,7 @@ public class CommentLikeController {
         return commentLikeService.increaseLike(comment_id,userDetails.getUser());
     }
 
-    @DeleteMapping("comment/{comment_id}/like")
+    @PutMapping("comment/{comment_id}/like")
     public ResponseEntity<RestApiResponseDto> decreaseLike(
             @PathVariable Long comment_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {

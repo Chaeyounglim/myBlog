@@ -9,7 +9,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name="commentLikes")
+@Table(name="commentlikes")
 @NoArgsConstructor
 public class CommentLike {
 
@@ -20,14 +20,14 @@ public class CommentLike {
     private boolean liked;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "commentId", nullable = false)
+    @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
-    public void CommentLike(User user, Comment comment){
+    public CommentLike(User user, Comment comment){
         this.user = user;
         this.comment = comment;
         this.liked = true;
