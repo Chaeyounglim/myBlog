@@ -68,7 +68,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/").permitAll() // 메인 페이지 요청 허가
                         .requestMatchers("/api/user/**").permitAll() // 로그인, 회원가입 누구나 가능.
                         .requestMatchers("/api/posts/**").permitAll() // '/api/posts/'로 시작하는 요청 모두 접근 허가 (전체,선택 게시글 조회)
-                        .requestMatchers("/api/post/**").authenticated() // '/api/posts/'로 시작하는 요청은 인증된 사용자 모두 접근 허가 (게시글,댓글 수정삭제)
+                        .requestMatchers("/api/post/**").hasAnyRole("USER", "ADMIN")
+                //.requestMatchers("/api/post/**").authenticated() // '/api/posts/'로 시작하는 요청은 인증된 사용자 모두 접근 허가 (게시글,댓글 수정삭제)
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
