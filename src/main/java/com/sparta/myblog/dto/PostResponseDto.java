@@ -31,8 +31,8 @@ public class PostResponseDto {
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
         this.likeCnt = post.getLikeCount();
+        this.commentResponseDtoList = new ArrayList<>();
         if(post.getCommentList().size()>0) {
-            this.commentResponseDtoList = new ArrayList<>();
             for (Comment comment : post.getCommentList()) {
                 this.commentResponseDtoList.add(new CommentResponseDto(comment));
             }
