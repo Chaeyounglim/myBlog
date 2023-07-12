@@ -2,6 +2,7 @@ package com.sparta.myblog.service;
 
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
+import com.sparta.myblog.entity.Comment;
 import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
 import com.sparta.myblog.entity.UserRoleEnum;
@@ -37,8 +38,13 @@ public class PostService {
         // 각 게시글 별 댓글 리스트 set 하기
         // Post 를 PostResponseDto 타입으로 변환하기
         for (Post post : postList) {
-            post.setCommentList(commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId()));
-            responseDtoList.add(new PostResponseDto(post));
+            // 최신 댓글 순으로 출력하기 위함.
+            PostResponseDto postResponseDto = new PostResponseDto(post);
+            if(postResponseDto.getCommentResponseDtoList().size()>0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
+                List<Comment> sortedCommentList = commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId());
+                postResponseDto.setCommentResponseDtoList(sortedCommentList);
+            }
+            responseDtoList.add(postResponseDto);
         }
         return responseDtoList;
     }
@@ -47,8 +53,12 @@ public class PostService {
     // 2. 선택한 게시글 한개 조회
     public PostResponseDto getPost(Long id) {
         Post post = findPost(id);
-        post.setCommentList(commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId()));
-        return new PostResponseDto(post);
+        PostResponseDto postResponseDto = new PostResponseDto(post);
+        if(postResponseDto.getCommentResponseDtoList().size()>0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
+            List<Comment> sortedCommentList  = commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId());
+            postResponseDto.setCommentResponseDtoList(sortedCommentList);
+        }
+        return postResponseDto;
     }
 
 

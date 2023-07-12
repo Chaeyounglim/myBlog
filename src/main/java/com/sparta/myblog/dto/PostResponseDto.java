@@ -39,4 +39,10 @@ public class PostResponseDto {
         }// end of the if()
     }// end of constructor method()
 
-}
+    public void setCommentResponseDtoList(List<Comment> sortedCommentList) {
+        this.getCommentResponseDtoList().clear();
+        for (Comment comment : sortedCommentList) {
+            this.commentResponseDtoList.add(new CommentResponseDto(comment));
+        }
+    }
+ }
