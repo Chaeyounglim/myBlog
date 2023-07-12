@@ -24,7 +24,7 @@ public class CommentLikeController {
         return commentLikeService.increaseLike(comment_id,userDetails.getUser());
     }
 
-    @PutMapping("comment/{comment_id}/like")
+    @PostMapping("comment/{comment_id}/like")
     public ResponseEntity<RestApiResponseDto> decreaseLike(
             @PathVariable Long comment_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
