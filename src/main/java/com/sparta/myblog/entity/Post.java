@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class Post extends Timestamped {
     private String title;
 
     @ColumnDefault("0")
-    private Long LikeCount;
+    private Long likeCount;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -47,6 +46,7 @@ public class Post extends Timestamped {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
         this.user = user;
+        this.likeCount = Long.getLong("0");
     }
 
     public void addComment(Comment comment) {
@@ -59,11 +59,11 @@ public class Post extends Timestamped {
     }
 
     public void increaseLike(){
-        this.LikeCount++;
+        this.likeCount++;
     }
 
     public void decreaseLike(){
-        this.LikeCount--;
+        this.likeCount--;
     }
 
 }

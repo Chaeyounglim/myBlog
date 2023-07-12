@@ -1,6 +1,5 @@
 package com.sparta.myblog.entity;
 
-import com.sparta.myblog.dto.LikeRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +16,8 @@ public class Like {
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
 
+    private boolean liked;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -25,9 +26,18 @@ public class Like {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    public Like(LikeRequestDto requestDto, User user, Post post) {
+    public Like(User user, Post post) {
         this.user = user;
         this.post = post;
+        this.liked = true;
+    }
+
+    public void changeLiked() {
+        if(this.liked){
+            this.liked = false;
+        }else {
+            this.liked = true;
+        }
     }
 
 

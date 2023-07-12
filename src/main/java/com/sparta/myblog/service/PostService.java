@@ -55,6 +55,7 @@ public class PostService {
     public PostResponseDto createPost(PostRequestDto requestDto, User user) {
         Post post = postRepository.save(new Post(requestDto,user));
         log.info("게시글 저장 완료");
+        log.info(String.valueOf(post.getLikeCount())); // null
         return new PostResponseDto(post);
     }
 
