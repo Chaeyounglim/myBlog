@@ -22,8 +22,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     // ADMIN_TOKEN
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
+
 
     // 회원가입 메서드
     public void signUp(UserRequestDto requestDto, HttpServletResponse res) throws IOException {

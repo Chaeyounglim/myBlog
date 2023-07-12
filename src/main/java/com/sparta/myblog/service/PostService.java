@@ -6,11 +6,13 @@ import com.sparta.myblog.entity.Comment;
 import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
 import com.sparta.myblog.entity.UserRoleEnum;
+import com.sparta.myblog.exception.PostNotFoundException;
 import com.sparta.myblog.repository.CommentRepository;
 import com.sparta.myblog.repository.PostRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Slf4j
@@ -27,6 +30,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final MessageSource messageSource;
 
 
     // 1. 전체 게시글 모두 조회
@@ -40,92 +44,110 @@ public class PostService {
         for (Post post : postList) {
             // 최신 댓글 순으로 출력하기 위함.
             PostResponseDto postResponseDto = new PostResponseDto(post);
-            if(postResponseDto.getCommentResponseDtoList().size()>0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
+            if (postResponseDto.getCommentResponseDtoList().size() > 0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
                 List<Comment> sortedCommentList = commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId());
                 postResponseDto.setCommentResponseDtoList(sortedCommentList);
-            }
+            } // the end of if()
             responseDtoList.add(postResponseDto);
-        }
+        } // the end of for()
         return responseDtoList;
     }
 
 
     // 2. 선택한 게시글 한개 조회
     public PostResponseDto getPost(Long id) {
-        Post post = findPost(id);
+        Post post = postRepository.findById(id).orElseThrow(() ->
+                new PostNotFoundException(messageSource.getMessage(
+                        "not.found.post",
+                        null,
+                        "Not Found post",
+                        Locale.getDefault()
+                ))
+        );
         PostResponseDto postResponseDto = new PostResponseDto(post);
-        if(postResponseDto.getCommentResponseDtoList().size()>0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
-            List<Comment> sortedCommentList  = commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId());
+        if (postResponseDto.getCommentResponseDtoList().size() > 0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
+            List<Comment> sortedCommentList = commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId());
             postResponseDto.setCommentResponseDtoList(sortedCommentList);
-        }
+        } // the end of if()
         return postResponseDto;
     }
 
 
+    // 3. 게시글 작성
     public PostResponseDto createPost(PostRequestDto requestDto, User user) {
-        Post post = postRepository.save(new Post(requestDto,user));
+        Post post = postRepository.save(new Post(requestDto, user));
         log.info("게시글 저장 완료");
-        log.info(String.valueOf(post.getLikeCount())); // null
         return new PostResponseDto(post);
     }
 
 
+    // 4. 게시글 수정
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto requestDto, User user) {
         // 1. 해당 게시글이 있는지 확인
-        Optional<Post> checkPost = postRepository.findById(id);
+        Post post = postRepository.findById(id).orElseThrow(() ->
+                new PostNotFoundException(messageSource.getMessage(
+                        "not.found.post",
+                        null,
+                        "Not Found post",
+                        Locale.getDefault()
+                ))
+        );
 
-        if(!checkPost.isPresent()){ // 1-1. 해당 게시글이 없을 경우 실행
-            log.error("수정 요청한 게시글이 없습니다.");
-            return null; // 해당 메서드 종료
-        }
-
-        // 1-2. 해당 게시글이 있을 경우 실행
-        Post post = this.findPost(id);
-
-        log.info("updatePost 접근");
         // 2. 해당 게시글의 작성자라면 수정하도록 함.
         Long inputId = post.getUser().getId(); // 게시글의 작성자 user_id
         Long loginId = user.getId(); // 로그인된 사용자 user_id
 
-        if(inputId.equals(loginId) || user.getRole().equals(UserRoleEnum.ADMIN)){
-            post.update(requestDto);
-            log.info("게시글 수정 완료");
-        }
+        if (!inputId.equals(loginId) || !user.getRole().equals(UserRoleEnum.ADMIN)) {
+            throw new IllegalArgumentException(
+                    messageSource.getMessage(
+                            "no.match.user",
+                            null,
+                            "No Match User",
+                            Locale.getDefault() // 국제화하는 것임.
+                    )
+            );
+        }// the end of if()
+
+        post.update(requestDto);
+        log.info("게시글 수정 완료");
         return new PostResponseDto(post);
     }
 
+
+    // 5. 게시글 삭제
     public void deletePost(HttpServletResponse res, Long id, User user) throws IOException {
         // 1. 해당 게시글이 있는지 확인
-        Optional<Post> checkPost = postRepository.findById(id);
+        Post post = postRepository.findById(id).orElseThrow(() ->
+                new PostNotFoundException(messageSource.getMessage(
+                        "not.found.post",
+                        null,
+                        "Not Found post",
+                        Locale.getDefault()
+                ))
+        );
 
-        if(!checkPost.isPresent()){ // 1-1. 해당 게시글이 없을 경우 실행
-            this.responseResult(res, 400, "게시글 삭제 실패 : 해당 게시글이 없습니다.");
-            log.error("삭제 요청한 게시글이 없습니다.");
-        }else { // 1-2 해당 게시글이 있을 경우 실행
-            Post post = this.findPost(id);
+        // 2. 해당 게시글의 작성자라면 수정하도록 함.
+        Long inputId = post.getUser().getId();// 게시글의 user_id
+        Long loginId = user.getId(); // 로그인된 user_id
 
-            // 2. 해당 게시글의 작성자라면 수정하도록 함.
-            Long inputId = post.getUser().getId();// 게시글의 user_id
-            Long loginId = user.getId(); // 로그인된 user_id
+        if (!inputId.equals(loginId) || !user.getRole().equals(UserRoleEnum.ADMIN)) {
+            throw new IllegalArgumentException(
+                    messageSource.getMessage(
+                            "no.match.user",
+                            null,
+                            "No Match User",
+                            Locale.getDefault() // 국제화하는 것임.
+                    )
+            );
+        }// the end of if()
 
-            log.info("deletePost 접근");
-            if (inputId.equals(loginId) || user.getRole().equals(UserRoleEnum.ADMIN)) {
-                postRepository.delete(post);
-                this.responseResult(res, 200, "게시글 삭제 성공");
-                log.info("게시글 삭제 완료");
-            } else {
-                this.responseResult(res, 400, "게시글 삭제 실패 : 해당 게시글의 작성자가 아닙니다.");
-                log.error("게시글 삭제 실패");
-            }
-        }
-
+        postRepository.delete(post);
+        this.responseResult(res, 200, "게시글 삭제 성공");
+        log.info("게시글 삭제 완료");
     }
 
-    private Post findPost(Long id) {
-        return postRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-    }
+
 
     private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
         String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";

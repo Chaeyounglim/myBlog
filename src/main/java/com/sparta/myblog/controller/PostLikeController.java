@@ -22,7 +22,8 @@ public class PostLikeController {
         return likeService.increaseLike(post_id,userDetails.getUser());
     }
 
-    @PostMapping("/post/{post_id}/like")
+
+    @PutMapping("/post/{post_id}/like")
     public ResponseEntity<RestApiResponseDto> decreaseLike(
             @PathVariable Long post_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {

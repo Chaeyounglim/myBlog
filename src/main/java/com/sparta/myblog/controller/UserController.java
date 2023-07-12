@@ -42,8 +42,4 @@ public class UserController {
         }
     }
 
-    @PostMapping("/user/login")
-    public void login(@RequestBody UserRequestDto userRequestDto) {
-
-    }
 }
