@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @DynamicInsert
-@Table(name = "post")
+@Table(name = "posts")
 @NoArgsConstructor
 public class Post extends Timestamped {
     @Id
@@ -39,7 +39,7 @@ public class Post extends Timestamped {
     private List<Comment> commentList = new ArrayList<>();
 
     @OneToMany( mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Like> likeList = new ArrayList<>();
+    private List<PostLike> likeList = new ArrayList<>();
 
 
     public Post(PostRequestDto requestDto, User user) {

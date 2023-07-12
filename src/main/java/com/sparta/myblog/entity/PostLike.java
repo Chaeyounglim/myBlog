@@ -8,9 +8,9 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
-@Table(name="likes")
+@Table(name="postLikes")
 @NoArgsConstructor
-public class Like {
+public class PostLike {
 
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
@@ -26,7 +26,7 @@ public class Like {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    public Like(User user, Post post) {
+    public PostLike(User user, Post post) {
         this.user = user;
         this.post = post;
         this.liked = true;
