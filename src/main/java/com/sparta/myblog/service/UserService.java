@@ -1,10 +1,8 @@
 package com.sparta.myblog.service;
 
 import com.sparta.myblog.dto.UserRequestDto;
-import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
 import com.sparta.myblog.entity.UserRoleEnum;
-import com.sparta.myblog.exception.PostNotFoundException;
 import com.sparta.myblog.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

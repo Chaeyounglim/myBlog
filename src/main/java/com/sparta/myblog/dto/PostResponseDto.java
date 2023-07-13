@@ -3,7 +3,6 @@ package com.sparta.myblog.dto;
 import com.sparta.myblog.entity.Comment;
 import com.sparta.myblog.entity.Post;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;

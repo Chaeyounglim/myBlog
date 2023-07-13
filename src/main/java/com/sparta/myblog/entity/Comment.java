@@ -1,9 +1,7 @@
 package com.sparta.myblog.entity;
 
 import com.sparta.myblog.dto.CommentRequestDto;
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

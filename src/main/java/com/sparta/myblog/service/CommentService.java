@@ -8,7 +8,6 @@ import com.sparta.myblog.exception.PostNotFoundException;
 import com.sparta.myblog.repository.CommentLikeRepository;
 import com.sparta.myblog.repository.CommentRepository;
 import com.sparta.myblog.repository.PostRepository;
-import com.sparta.myblog.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
