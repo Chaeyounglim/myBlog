@@ -96,7 +96,7 @@ public class PostService {
         Long inputId = post.getUser().getId(); // 게시글의 작성자 user_id
         Long loginId = user.getId(); // 로그인된 사용자 user_id
 
-        if (!inputId.equals(loginId) || !user.getRole().equals(UserRoleEnum.ADMIN)) {
+        if (!inputId.equals(loginId) && !user.getRole().equals(UserRoleEnum.ADMIN)) {
             throw new IllegalArgumentException(
                     messageSource.getMessage(
                             "no.match.user",
@@ -129,7 +129,7 @@ public class PostService {
         Long inputId = post.getUser().getId();// 게시글의 user_id
         Long loginId = user.getId(); // 로그인된 user_id
 
-        if (!inputId.equals(loginId) || !user.getRole().equals(UserRoleEnum.ADMIN)) {
+        if (!inputId.equals(loginId) && !user.getRole().equals(UserRoleEnum.ADMIN)) {
             throw new IllegalArgumentException(
                     messageSource.getMessage(
                             "no.match.user",

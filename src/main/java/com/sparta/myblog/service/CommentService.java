@@ -77,7 +77,7 @@ public class CommentService {
         Long commentUserId = comment.getUser().getId();
 
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
-        if (!commentUserId.equals(user.getId()) || !user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
+        if (!commentUserId.equals(user.getId()) && !user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 수정 요청");
             throw new IllegalArgumentException(
                     messageSource.getMessage(
@@ -112,7 +112,7 @@ public class CommentService {
         Long commentUserId = comment.getUser().getId();
 
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
-        if (!commentUserId.equals(user.getId()) || !user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
+        if (!commentUserId.equals(user.getId()) && !user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 삭제 요청");
             throw new IllegalArgumentException(
                     messageSource.getMessage(
