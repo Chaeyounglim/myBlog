@@ -2,12 +2,10 @@ package com.sparta.myblog.service;
 
 import com.sparta.myblog.dto.CommentRequestDto;
 import com.sparta.myblog.dto.CommentResponseDto;
-import com.sparta.myblog.entity.Comment;
-import com.sparta.myblog.entity.Post;
-import com.sparta.myblog.entity.User;
-import com.sparta.myblog.entity.UserRoleEnum;
+import com.sparta.myblog.entity.*;
 import com.sparta.myblog.exception.CommentNotFoundException;
 import com.sparta.myblog.exception.PostNotFoundException;
+import com.sparta.myblog.repository.CommentLikeRepository;
 import com.sparta.myblog.repository.CommentRepository;
 import com.sparta.myblog.repository.PostRepository;
 import com.sparta.myblog.security.UserDetailsImpl;
@@ -20,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Locale;
 
 @Slf4j
@@ -27,6 +26,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final CommentLikeRepository commentLikeRepository;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final MessageSource messageSource;
@@ -125,9 +125,15 @@ public class CommentService {
         } // the end of if()
 
         // 4. 해당 댓글 삭제하기
+        this.deleteLike(commentId); // 해당 댓글에 해당하는 좋아요 데이터 삭제
         commentRepository.delete(comment);
         responseResult(res, 200, "댓글 삭제 성공");
         log.info("댓글 삭제 완료");
+    }
+
+    private void deleteLike(Long commentId) {
+        List<CommentLike> likeList = commentLikeRepository.findByCommentId(commentId);
+        commentLikeRepository.deleteAll(likeList);
     }
 
 

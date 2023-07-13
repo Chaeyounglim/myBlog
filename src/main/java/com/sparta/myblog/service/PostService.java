@@ -2,12 +2,10 @@ package com.sparta.myblog.service;
 
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
-import com.sparta.myblog.entity.Comment;
-import com.sparta.myblog.entity.Post;
-import com.sparta.myblog.entity.User;
-import com.sparta.myblog.entity.UserRoleEnum;
+import com.sparta.myblog.entity.*;
 import com.sparta.myblog.exception.PostNotFoundException;
 import com.sparta.myblog.repository.CommentRepository;
+import com.sparta.myblog.repository.PostLikeRepository;
 import com.sparta.myblog.repository.PostRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,6 +28,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final MessageSource messageSource;
+    private final PostLikeRepository postLikeRepository;
 
 
     // 1. 전체 게시글 모두 조회
@@ -142,6 +140,7 @@ public class PostService {
             );
         }// the end of if()
 
+        this.deleteLike(id);  // 해당 게시글에 해당하는 좋아요 데이터 삭제
         postRepository.delete(post);
         this.responseResult(res, 200, "게시글 삭제 성공");
         log.info("게시글 삭제 완료");
@@ -162,5 +161,9 @@ public class PostService {
         writer.flush();
     }
 
+    private void deleteLike(Long id){
+        List<PostLike> likeList = postLikeRepository.findByPostId(id);
+        postLikeRepository.deleteAll(likeList);
+    }
 
 }

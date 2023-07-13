@@ -38,16 +38,6 @@ public class PostLikeService {
                 ))
         );
 
-/*        Optional<Post> checkPost = postRepository.findById(postId);
-
-        if(!checkPost.isPresent()){
-            return getRestApiResponseDtoResponseEntity(
-                    "해당 게시글이 없습니다.", HttpStatus.NOT_FOUND);
-        }
-
-        // 2. 해당 게시글에 좋아요 cnt 를 증가시키기 위해 가져옴.
-        Post post = checkPost.get();*/
-
         // 3. 현재 로그인한 사용자가 해당 게시글을 좋아요를 눌렀는지 판단 -> 2번 누를수 없음.
         Optional<PostLike> checkLike = likeRepository.findByUserIdAndPostId(user.getId(),postId);
 
@@ -63,8 +53,6 @@ public class PostLikeService {
                                 Locale.getDefault() // 국제화하는 것임.
                         )
                 );
-/*                return getRestApiResponseDtoResponseEntity(
-                        "좋아요 실패: 좋아요가 이미 눌러져 있습니다.", HttpStatus.BAD_REQUEST);*/
             }else {
                 // liked 필드가 false 일 경우
                 PostLike like = checkLike.get();

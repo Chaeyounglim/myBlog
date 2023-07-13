@@ -31,6 +31,7 @@ public class CommentLikeService {
     @Transactional
     public ResponseEntity<RestApiResponseDto> increaseLike(Long id, User user) {
         // 1. 댓글 가져오기
+
         Comment comment = commentRepository.findById(id).orElseThrow(() ->
                 new CommentNotFoundException(messageSource.getMessage(
                         "not.found.comment",
@@ -39,6 +40,16 @@ public class CommentLikeService {
                         Locale.getDefault()
                 ))
         );
+
+
+/*        Comment comment = commentRepository.findById(id).orElseThrow(() ->
+                new CommentNotFoundException(messageSource.getMessage(
+                        "not.found.comment",
+                        null,
+                        "Not Found comment",
+                        Locale.getDefault()
+                ))
+        );*/
 
         // 2. 댓글 데이터가 있을 경우
         Optional<CommentLike> checkLike = likeRepository.findByUserIdAndCommentId(user.getId(), comment.getId());

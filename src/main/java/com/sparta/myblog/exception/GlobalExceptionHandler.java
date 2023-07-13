@@ -27,8 +27,6 @@ public class GlobalExceptionHandler {
     }
 
     // null 포인트는 매개변수가 null
-
-
     // IllegalArgumentException 는 적합하지 않거나(illegal) 적절하지 못한(inappropriate) 인자를 메소드에 넘겨주었을 때 발생
 
     @ExceptionHandler({PostNotFoundException.class})
@@ -48,5 +46,6 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
 
 }
