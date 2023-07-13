@@ -1,17 +1,21 @@
 package com.sparta.myblog.service;
 
 import com.sparta.myblog.dto.UserRequestDto;
+import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
 import com.sparta.myblog.entity.UserRoleEnum;
+import com.sparta.myblog.exception.PostNotFoundException;
 import com.sparta.myblog.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Locale;
 import java.util.Optional;
 
 @Slf4j
@@ -21,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
 
 
     // ADMIN_TOKEN
@@ -34,17 +39,20 @@ public class UserService {
         String password = passwordEncoder.encode(requestDto.getPassword());
         UserRoleEnum role = UserRoleEnum.USER;
 
-        //log.info(requestDto.getAdminToken());
-
         // 2. 회원 중복 확인
         // 2-1. DB에 해당 username 에 대한 row 가 있다면 checkUsername 변수에 저장.
         Optional<User> checkUsername = userRepository.findByUsername(username);
 
         // 2-2. 중복된 회원이 있을 경우
         if (checkUsername.isPresent()) {
-            responseResult(res, 400, "중복된 username 입니다.");
-            log.error("중복된 사용자가 존재합니다.");
-            return;
+            throw new IllegalArgumentException(
+                    messageSource.getMessage(
+                            "duplicated.user",
+                            new String[]{username},
+                            "duplicated user",
+                            Locale.getDefault() // 국제화하는 것임.
+                    )
+            );
         }
 
         // 2-2. 중복된 회원이 없을 경우 가입 시도

@@ -41,16 +41,6 @@ public class CommentLikeService {
                 ))
         );
 
-
-/*        Comment comment = commentRepository.findById(id).orElseThrow(() ->
-                new CommentNotFoundException(messageSource.getMessage(
-                        "not.found.comment",
-                        null,
-                        "Not Found comment",
-                        Locale.getDefault()
-                ))
-        );*/
-
         // 2. 댓글 데이터가 있을 경우
         Optional<CommentLike> checkLike = likeRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
 
