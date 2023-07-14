@@ -1,6 +1,7 @@
 package com.sparta.myblog.controller;
 
 import com.sparta.myblog.dto.RestApiResponseDto;
+import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
 import com.sparta.myblog.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class PostLikeController {
     public ResponseEntity<RestApiResponseDto> increaseLike(
             @PathVariable Long post_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        this.tokenValidate(userDetails);
         return likeService.increaseLike(post_id,userDetails.getUser());
     }
 
@@ -27,8 +29,16 @@ public class PostLikeController {
     public ResponseEntity<RestApiResponseDto> decreaseLike(
             @PathVariable Long post_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        this.tokenValidate(userDetails);
         return likeService.decreaseLike(post_id,userDetails.getUser());
     }
 
+    public void tokenValidate(UserDetailsImpl userDetails) {
+        try{
+            userDetails.getUser();
+        }catch (Exception ex){
+            throw new TokenNotValidateException("토큰이 유효하지 않습니다.");
+        }
+    }
 
 }

@@ -40,14 +40,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(tokenValue)) { // 토큰이 있을 경우
             if (!jwtUtil.validateToken(tokenValue)) { // 토큰 검증 실패 시
-                responseResult(res,HttpStatus.BAD_REQUEST,"토큰이 유효하지 않습니다.");
+                responseResult(res,HttpStatus.UNAUTHORIZED,"토큰이 유효하지 않습니다.");
                 return;
             }
             try {
-                Claims info = jwtUtil.getUserInfoFromToken(tokenValue,res); // 토큰으로 사용자 정보 가져오기
+                Claims info = jwtUtil.getUserInfoFromToken(tokenValue); // 토큰으로 사용자 정보 가져오기
                 setAuthentication(info.getSubject());
             } catch (Exception e) { // 만료되지 않은 토큰에 대한 유저 정보가 DB에 없을 경우 인가?
                 log.error(e.getMessage());
+                responseResult(res,HttpStatus.NOT_FOUND,"user not found");
                 return;
             }
         }

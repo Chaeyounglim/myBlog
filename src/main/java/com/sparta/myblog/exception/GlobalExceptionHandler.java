@@ -29,6 +29,16 @@ public class GlobalExceptionHandler {
     // null 포인트는 매개변수가 null
     // IllegalArgumentException 는 적합하지 않거나(illegal) 적절하지 못한(inappropriate) 인자를 메소드에 넘겨주었을 때 발생
 
+    @ExceptionHandler({TokenNotValidateException.class})
+    public ResponseEntity<RestApiException> UnvalidatedTokenHandler(TokenNotValidateException ex) {
+        RestApiException restApiException = new RestApiException(ex.getMessage(), HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<>(
+                restApiException,
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+
     @ExceptionHandler({PostNotFoundException.class})
     public ResponseEntity<RestApiException> notFoundPostExceptionHandler(PostNotFoundException ex) {
         RestApiException restApiException = new RestApiException(ex.getMessage(), HttpStatus.NOT_FOUND.value());

@@ -3,6 +3,7 @@ package com.sparta.myblog.controller;
 
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
+import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
 import com.sparta.myblog.service.PostService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +29,6 @@ public class PostController {
     }
 
 
-
     // 선택한 게시글 상세 조회
     @GetMapping("/posts/{id}")
     public PostResponseDto getPost(@PathVariable Long id) {
@@ -41,6 +41,7 @@ public class PostController {
     public PostResponseDto createPost(
             @RequestBody PostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        this.tokenValidate(userDetails);
         return postService.createPost(requestDto, userDetails.getUser());
     }
 
@@ -51,6 +52,7 @@ public class PostController {
             @PathVariable Long id,
             @RequestBody PostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        this.tokenValidate(userDetails);
         return postService.updatePost(id, requestDto, userDetails.getUser());
     }
 
@@ -61,7 +63,16 @@ public class PostController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             HttpServletResponse res) throws IOException {
-        postService.deletePost(res,id, userDetails.getUser());
+        this.tokenValidate(userDetails);
+        postService.deletePost(res, id, userDetails.getUser());
+    }
+
+    public void tokenValidate(UserDetailsImpl userDetails) {
+        try{
+            userDetails.getUser();
+        }catch (Exception ex){
+            throw new TokenNotValidateException("토큰이 유효하지 않습니다.");
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.sparta.myblog.controller;
 
 import com.sparta.myblog.dto.CommentRequestDto;
 import com.sparta.myblog.dto.CommentResponseDto;
+import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
 import com.sparta.myblog.service.CommentService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ public class CommentController {
             @PathVariable Long post_id,
             @RequestBody CommentRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        this.tokenValidate(userDetails);
         return commentService.createComment(post_id, requestDto, userDetails.getUser());
     }
 
@@ -33,6 +35,7 @@ public class CommentController {
             @RequestBody CommentRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             HttpServletResponse response) throws IOException {
+        this.tokenValidate(userDetails);
         return commentService.updateComment(response,comment_id,requestDto,userDetails.getUser());
     }
 
@@ -42,6 +45,15 @@ public class CommentController {
             @PathVariable Long comment_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             HttpServletResponse res) throws IOException {
+        this.tokenValidate(userDetails);
         commentService.deleteComment(res,comment_id,userDetails.getUser());
+    }
+
+    public void tokenValidate(UserDetailsImpl userDetails) {
+        try{
+            userDetails.getUser();
+        }catch (Exception ex){
+            throw new TokenNotValidateException("토큰이 유효하지 않습니다.");
+        }
     }
 }
