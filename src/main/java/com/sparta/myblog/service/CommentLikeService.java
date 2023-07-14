@@ -119,9 +119,9 @@ public class CommentLikeService {
 
     private ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(
             String message, HttpStatus status) {
-        RestApiResponseDto restApiException = new RestApiResponseDto(message, status.value());
+        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(message, status.value());
         return new ResponseEntity<>(
-                restApiException,
+                restApiResponseDto,
                 status
         );
     }

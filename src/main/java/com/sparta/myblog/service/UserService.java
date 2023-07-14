@@ -1,5 +1,7 @@
 package com.sparta.myblog.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.myblog.dto.RestApiResponseDto;
 import com.sparta.myblog.dto.UserRequestDto;
 import com.sparta.myblog.entity.User;
 import com.sparta.myblog.entity.UserRoleEnum;
@@ -8,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +61,7 @@ public class UserService {
         // 3. 사용자 ROLE 부여
         if(requestDto.isAdmin()) {
             if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
-                responseResult(res, 400, "관리자 암호가 아닙니다.");
+                responseResult(res, HttpStatus.BAD_REQUEST, "관리자 암호가 아닙니다.");
                 log.error("관리자 암호가 틀려 등록이 불가능합니다.");
                 return;
             } else {
@@ -71,15 +74,20 @@ public class UserService {
         userRepository.save(user);
 
         // 5. Client 에 반환할 데이터 및 log 출력
-        responseResult(res, 200, "회원가입 성공");
+        responseResult(res, HttpStatus.OK, "회원가입 성공");
         log.info("회원가입에 성공하였습니다.");
 
     }
 
 
     // Client 에 HttpServletResponse 를 통해 반환할 msg, status 세팅 메서드
-    private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
-        String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
+    private void responseResult(HttpServletResponse res, HttpStatus status, String message) throws IOException {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        RestApiResponseDto dto = new RestApiResponseDto(message, status.value());
+        ObjectMapper objectMapper = new ObjectMapper();
+        res.getWriter().write(objectMapper.writeValueAsString(dto));
+/*        String jsonResponse = "{\"status\": " + status.value() + ", \"message\": \"" + message + "\"}";
 
         // Content-Type 및 문자 인코딩 설정
         response.setContentType("application/json");
@@ -88,6 +96,6 @@ public class UserService {
         // PrintWriter 를 사용하여 응답 데이터 전송
         PrintWriter writer = response.getWriter();
         writer.write(jsonResponse);
-        writer.flush();
+        writer.flush();*/
     }
 }

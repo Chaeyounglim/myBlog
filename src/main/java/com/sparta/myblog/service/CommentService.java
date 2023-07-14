@@ -1,7 +1,9 @@
 package com.sparta.myblog.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.myblog.dto.CommentRequestDto;
 import com.sparta.myblog.dto.CommentResponseDto;
+import com.sparta.myblog.dto.RestApiResponseDto;
 import com.sparta.myblog.entity.*;
 import com.sparta.myblog.exception.CommentNotFoundException;
 import com.sparta.myblog.exception.PostNotFoundException;
@@ -12,11 +14,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,7 +63,7 @@ public class CommentService {
     // 댓글 수정하기
     @Transactional
     public CommentResponseDto updateComment(
-            HttpServletResponse response, Long commentId, CommentRequestDto requestDto, User user) throws IOException {
+            HttpServletResponse res, Long commentId, CommentRequestDto requestDto, User user) throws IOException {
         // 1. 해당하는 댓글 가져오기
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException(messageSource.getMessage(
@@ -87,6 +89,7 @@ public class CommentService {
                     )
             );
         } // the end of if()
+        responseResult(res, HttpStatus.OK, "댓글 수정 성공");
 
         // 4. 해당 댓글 수정하기
         comment.update(requestDto);
@@ -123,22 +126,27 @@ public class CommentService {
             );
         } // the end of if()
 
-        // 4. 해당 댓글 삭제하기
-        this.deleteLike(commentId); // 해당 댓글에 해당하는 좋아요 데이터 삭제
-        commentRepository.delete(comment);
-        responseResult(res, 200, "댓글 삭제 성공");
-        log.info("댓글 삭제 완료");
-    }
-
-    private void deleteLike(Long commentId) {
+        // 4. 해당 댓글에 해당하는 좋아요 데이터 삭제
         List<CommentLike> likeList = commentLikeRepository.findByCommentId(commentId);
         commentLikeRepository.deleteAll(likeList);
+
+        // 5. 해당 댓글 삭제하기
+        commentRepository.delete(comment);
+        responseResult(res, HttpStatus.OK, "댓글 삭제 성공");
+
+        log.info("댓글 삭제 완료");
     }
 
 
     // Client 에 HttpServletResponse 를 통해 반환할 msg, status 세팅 메서드
-    private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
-        String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
+    private void responseResult(HttpServletResponse res, HttpStatus status,  String message) throws IOException {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        RestApiResponseDto dto = new RestApiResponseDto(message, status.value());
+        ObjectMapper objectMapper = new ObjectMapper();
+        res.getWriter().write(objectMapper.writeValueAsString(dto));
+
+/*        String jsonResponse = "{\"status\": " + status.value() + ", \"message\": \"" + message + "\"}";
 
         // Content-Type 및 문자 인코딩 설정
         response.setContentType("application/json");
@@ -147,7 +155,7 @@ public class CommentService {
         // PrintWriter 를 사용하여 응답 데이터 전송
         PrintWriter writer = response.getWriter();
         writer.write(jsonResponse);
-        writer.flush();
+        writer.flush();*/
     }
 
 }

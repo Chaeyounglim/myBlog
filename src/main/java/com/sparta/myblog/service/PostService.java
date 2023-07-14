@@ -1,7 +1,9 @@
 package com.sparta.myblog.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
+import com.sparta.myblog.dto.RestApiResponseDto;
 import com.sparta.myblog.entity.*;
 import com.sparta.myblog.exception.PostNotFoundException;
 import com.sparta.myblog.repository.CommentRepository;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -140,16 +143,26 @@ public class PostService {
             );
         }// the end of if()
 
-        this.deleteLike(id);  // 해당 게시글에 해당하는 좋아요 데이터 삭제
+        // 해당 게시글에 해당하는 좋아요 데이터 삭제
+        List<PostLike> likeList = postLikeRepository.findByPostId(id);
+        postLikeRepository.deleteAll(likeList);
+
+        // 해당 게시글 삭제
         postRepository.delete(post);
-        this.responseResult(res, 200, "게시글 삭제 성공");
+        this.responseResult(res, HttpStatus.OK, "게시글 삭제 성공");
         log.info("게시글 삭제 완료");
     }
 
 
 
-    private void responseResult(HttpServletResponse response, int statusCode, String message) throws IOException {
-        String jsonResponse = "{\"status\": " + statusCode + ", \"message\": \"" + message + "\"}";
+    private void responseResult(HttpServletResponse res, HttpStatus status, String message) throws IOException {
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+        RestApiResponseDto dto = new RestApiResponseDto(message, status.value());
+        ObjectMapper objectMapper = new ObjectMapper();
+        res.getWriter().write(objectMapper.writeValueAsString(dto));
+
+/*        String jsonResponse = "{\"status\": " + status.value() + ", \"message\": \"" + message + "\"}";
 
         // Content-Type 및 문자 인코딩 설정
         response.setContentType("application/json");
@@ -158,12 +171,8 @@ public class PostService {
         // PrintWriter 를 사용하여 응답 데이터 전송
         PrintWriter writer = response.getWriter();
         writer.write(jsonResponse);
-        writer.flush();
+        writer.flush();*/
     }
 
-    private void deleteLike(Long id){
-        List<PostLike> likeList = postLikeRepository.findByPostId(id);
-        postLikeRepository.deleteAll(likeList);
-    }
 
 }
