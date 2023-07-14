@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RestApiResponseDto {
 
-    private String resultMessage;
     private int statusCode;
+    private String resultMessage;
 }

@@ -158,20 +158,9 @@ public class PostService {
     private void responseResult(HttpServletResponse res, HttpStatus status, String message) throws IOException {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        RestApiResponseDto dto = new RestApiResponseDto(message, status.value());
+        RestApiResponseDto dto = new RestApiResponseDto(status.value(), message);
         ObjectMapper objectMapper = new ObjectMapper();
         res.getWriter().write(objectMapper.writeValueAsString(dto));
-
-/*        String jsonResponse = "{\"status\": " + status.value() + ", \"message\": \"" + message + "\"}";
-
-        // Content-Type 및 문자 인코딩 설정
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        // PrintWriter 를 사용하여 응답 데이터 전송
-        PrintWriter writer = response.getWriter();
-        writer.write(jsonResponse);
-        writer.flush();*/
     }
 
 

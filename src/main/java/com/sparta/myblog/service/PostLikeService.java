@@ -124,7 +124,7 @@ public class PostLikeService {
 
     private ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(
             String message,HttpStatus status) {
-        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(message, status.value());
+        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(status.value(),message);
         return new ResponseEntity<>(
                 restApiResponseDto,
                 status
