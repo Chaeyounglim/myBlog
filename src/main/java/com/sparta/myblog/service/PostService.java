@@ -12,16 +12,13 @@ import com.sparta.myblog.repository.PostRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Slf4j
 @Service
@@ -30,7 +27,6 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final MessageSource messageSource;
     private final PostLikeRepository postLikeRepository;
 
 
@@ -58,13 +54,7 @@ public class PostService {
     // 2. 선택한 게시글 한개 조회
     public PostResponseDto getPost(Long id) {
         Post post = postRepository.findById(id).orElseThrow(() ->
-                new PostNotFoundException(messageSource.getMessage(
-                        "not.found.post",
-                        null,
-                        "Not Found post",
-                        Locale.getDefault()
-                ))
-        );
+                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
         PostResponseDto postResponseDto = new PostResponseDto(post);
         if (postResponseDto.getCommentResponseDtoList().size() > 0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
             List<Comment> sortedCommentList = commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId());
@@ -87,27 +77,14 @@ public class PostService {
     public PostResponseDto updatePost(Long id, PostRequestDto requestDto, User user) {
         // 1. 해당 게시글이 있는지 확인
         Post post = postRepository.findById(id).orElseThrow(() ->
-                new PostNotFoundException(messageSource.getMessage(
-                        "not.found.post",
-                        null,
-                        "Not Found post",
-                        Locale.getDefault()
-                ))
-        );
+                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
 
         // 2. 해당 게시글의 작성자라면 수정하도록 함.
         Long inputId = post.getUser().getId(); // 게시글의 작성자 user_id
         Long loginId = user.getId(); // 로그인된 사용자 user_id
 
         if (!inputId.equals(loginId) && !user.getRole().equals(UserRoleEnum.ADMIN)) {
-            throw new IllegalArgumentException(
-                    messageSource.getMessage(
-                            "no.match.user",
-                            null,
-                            "No Match User",
-                            Locale.getDefault() // 국제화하는 것임.
-                    )
-            );
+            throw new IllegalArgumentException("작성자 혹은 관리자만 삭제/수정 할 수 있습니다.");
         }// the end of if()
 
         post.update(requestDto);
@@ -120,27 +97,14 @@ public class PostService {
     public void deletePost(HttpServletResponse res, Long id, User user) throws IOException {
         // 1. 해당 게시글이 있는지 확인
         Post post = postRepository.findById(id).orElseThrow(() ->
-                new PostNotFoundException(messageSource.getMessage(
-                        "not.found.post",
-                        null,
-                        "Not Found post",
-                        Locale.getDefault()
-                ))
-        );
+                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
 
         // 2. 해당 게시글의 작성자라면 수정하도록 함.
         Long inputId = post.getUser().getId();// 게시글의 user_id
         Long loginId = user.getId(); // 로그인된 user_id
 
         if (!inputId.equals(loginId) && !user.getRole().equals(UserRoleEnum.ADMIN)) {
-            throw new IllegalArgumentException(
-                    messageSource.getMessage(
-                            "no.match.user",
-                            null,
-                            "No Match User",
-                            Locale.getDefault() // 국제화하는 것임.
-                    )
-            );
+            throw new IllegalArgumentException("작성자 혹은 관리자만 삭제/수정 할 수 있습니다.");
         }// the end of if()
 
         // 해당 게시글에 해당하는 좋아요 데이터 삭제

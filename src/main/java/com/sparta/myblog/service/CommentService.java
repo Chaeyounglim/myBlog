@@ -13,14 +13,12 @@ import com.sparta.myblog.repository.PostRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 @Slf4j
 @Service
@@ -30,7 +28,6 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-    private final MessageSource messageSource;
 
 
     // 댓글 작성하기
@@ -38,13 +35,7 @@ public class CommentService {
     (Long postId, CommentRequestDto requestDto, User user) {
         // 해당 게시글이 있는지
         Post post = postRepository.findById(postId).orElseThrow(() ->
-                new PostNotFoundException(messageSource.getMessage(
-                        "not.found.post",
-                        null,
-                        "Not Found post",
-                        Locale.getDefault()
-                ))
-        );
+                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
 
         // DB에 댓글 저장하기.
         Comment comment = new Comment(requestDto);
@@ -66,13 +57,7 @@ public class CommentService {
             HttpServletResponse res, Long commentId, CommentRequestDto requestDto, User user) throws IOException {
         // 1. 해당하는 댓글 가져오기
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new CommentNotFoundException(messageSource.getMessage(
-                        "not.found.comment",
-                        null,
-                        "Not Found comment",
-                        Locale.getDefault()
-                ))
-        );
+                new CommentNotFoundException("해당 댓글이 존재하지 않습니다."));
 
         // 2. 댓글 작성자 이름 가져오기
         Long commentUserId = comment.getUser().getId();
@@ -80,14 +65,7 @@ public class CommentService {
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
         if (!commentUserId.equals(user.getId()) && !user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 수정 요청");
-            throw new IllegalArgumentException(
-                    messageSource.getMessage(
-                            "no.match.user",
-                            null,
-                            "No Match User",
-                            Locale.getDefault() // 국제화하는 것임.
-                    )
-            );
+            throw new IllegalArgumentException("작성자 혹은 관리자만 삭제/수정 할 수 있습니다.");
         } // the end of if()
         responseResult(res, HttpStatus.OK, "댓글 수정 성공");
 
@@ -102,13 +80,7 @@ public class CommentService {
     public void deleteComment(HttpServletResponse res, Long commentId, User user) throws IOException {
         // 1. 해당하는 댓글 가져오기
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new CommentNotFoundException(messageSource.getMessage(
-                        "not.found.comment",
-                        null,
-                        "Not Found comment",
-                        Locale.getDefault()
-                ))
-        );
+                new CommentNotFoundException("해당 댓글이 존재하지 않습니다."));
 
         // 2. 댓글 작성자 이름 가져오기
         Long commentUserId = comment.getUser().getId();
@@ -116,14 +88,7 @@ public class CommentService {
         // 3. 로그인한 유저가 해당 댓글 작성자인지 확인하기
         if (!commentUserId.equals(user.getId()) && !user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 삭제 요청");
-            throw new IllegalArgumentException(
-                    messageSource.getMessage(
-                            "no.match.user",
-                            null,
-                            "No Match User",
-                            Locale.getDefault() // 국제화하는 것임.
-                    )
-            );
+            throw new IllegalArgumentException("작성자 혹은 관리자만 삭제/수정 할 수 있습니다.");
         } // the end of if()
 
         // 4. 해당 댓글에 해당하는 좋아요 데이터 삭제
