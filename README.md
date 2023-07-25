@@ -1,6 +1,7 @@
 # myBlog
-It's blog to do; 
 </br>
+태선 튜터님의 코드와 강의를 통해 코드 리팩토링 완료 <br/>
+참조 REPO : https://github.com/thesun4sky/spring-blog/blob/lv4/﻿
 </br>
 </br>
 </br>
