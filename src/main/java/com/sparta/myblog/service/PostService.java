@@ -1,6 +1,5 @@
 package com.sparta.myblog.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.dto.RestApiResponseDto;
@@ -13,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,16 +65,16 @@ public class PostService {
 
 
     // 3. 게시글 작성
-    public PostResponseDto createPost(PostRequestDto requestDto, User user) {
+    public ResponseEntity<RestApiResponseDto> createPost(PostRequestDto requestDto, User user) {
         Post post = postRepository.save(new Post(requestDto, user));
         log.info("게시글 저장 완료");
-        return new PostResponseDto(post);
+        return getRestApiResponseDtoResponseEntity( "게시글 작성 성공",HttpStatus.OK,new PostResponseDto(post));
     }
 
 
     // 4. 게시글 수정
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto requestDto, User user) {
+    public ResponseEntity<RestApiResponseDto> updatePost(Long id, PostRequestDto requestDto, User user) {
         // 1. 해당 게시글이 있는지 확인
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
@@ -89,12 +89,12 @@ public class PostService {
 
         post.update(requestDto);
         log.info("게시글 수정 완료");
-        return new PostResponseDto(post);
+        return getRestApiResponseDtoResponseEntity( "게시글 수정 성공",HttpStatus.OK,new PostResponseDto(post));
     }
 
 
     // 5. 게시글 삭제
-    public void deletePost(HttpServletResponse res, Long id, User user) throws IOException {
+    public ResponseEntity<RestApiResponseDto> deletePost(HttpServletResponse res, Long id, User user) throws IOException {
         // 1. 해당 게시글이 있는지 확인
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
@@ -113,18 +113,20 @@ public class PostService {
 
         // 해당 게시글 삭제
         postRepository.delete(post);
-        this.responseResult(res, HttpStatus.OK, "게시글 삭제 성공");
         log.info("게시글 삭제 완료");
+
+        return getRestApiResponseDtoResponseEntity( "게시글 삭제 성공",HttpStatus.OK,null);
     }
 
 
 
-    private void responseResult(HttpServletResponse res, HttpStatus status, String message) throws IOException {
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
-        RestApiResponseDto dto = new RestApiResponseDto(status.value(), message);
-        ObjectMapper objectMapper = new ObjectMapper();
-        res.getWriter().write(objectMapper.writeValueAsString(dto));
+    private ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(
+            String message, HttpStatus status, Object result) {
+        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(status.value(),message,result);
+        return new ResponseEntity<>(
+                restApiResponseDto,
+                status
+        );
     }
 
 

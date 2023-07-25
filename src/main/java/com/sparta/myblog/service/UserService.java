@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -73,9 +74,9 @@ public class UserService {
         userRepository.save(user);
 
         // 5. Client 에 반환할 데이터 및 log 출력
-        responseResult(res, HttpStatus.OK, "회원가입 성공");
         log.info("회원가입에 성공하였습니다.");
 
+        responseResult(res, HttpStatus.OK, "회원가입 성공");
     }
 
 
@@ -83,7 +84,7 @@ public class UserService {
     private void responseResult(HttpServletResponse res, HttpStatus status, String message) throws IOException {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        RestApiResponseDto dto = new RestApiResponseDto(status.value(), message);
+        RestApiResponseDto dto = new RestApiResponseDto(status.value(), message,null);
         ObjectMapper objectMapper = new ObjectMapper();
         res.getWriter().write(objectMapper.writeValueAsString(dto));
     }

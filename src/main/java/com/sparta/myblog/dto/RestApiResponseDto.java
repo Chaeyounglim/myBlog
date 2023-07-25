@@ -9,4 +9,5 @@ public class RestApiResponseDto {
 
     private int statusCode;
     private String resultMessage;
+    private Object result;
 }
