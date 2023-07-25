@@ -3,6 +3,7 @@ package com.sparta.myblog.service;
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.dto.RestApiResponseDto;
+import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,21 +38,21 @@ public interface PostService {
 
     /**
      * 게시글 수정
-     * @param id 수정 요청한 게시글 id
+     * @param post 수정 요청한 게시글
      * @param requestDto 수정할 내용
      * @param user 수정 요청한 유저
      * @return 상태 코드 및 메시지, 수정한 게시글 데이터
      */
-    ResponseEntity<RestApiResponseDto> updatePost(Long id, PostRequestDto requestDto, User user);
+    ResponseEntity<RestApiResponseDto> updatePost(Post post, PostRequestDto requestDto, User user);
 
 
     /**
      * 게시글 삭제
-     * @param id 삭제할 게시글 id
+     * @param post 삭제할 게시글
      * @param user 삭제 요청한 유저
      * @return 상태 코드 및 메시지
      */
-    ResponseEntity<RestApiResponseDto> deletePost(Long id, User user);
+    ResponseEntity<RestApiResponseDto> deletePost(Post post, User user);
 
     /**
      * 반환 메소드

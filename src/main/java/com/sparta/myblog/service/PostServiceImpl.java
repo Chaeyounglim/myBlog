@@ -53,8 +53,8 @@ public class PostServiceImpl implements PostService{
     // 2. 선택한 게시글 한개 조회
     @Override
     public PostResponseDto getPost(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() ->
-                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
+        Post post = findByPost(id);
+
         PostResponseDto postResponseDto = new PostResponseDto(post);
         if (postResponseDto.getCommentResponseDtoList().size() > 0) { // 해당 게시글에 댓글이 있을 경우 내림차순 정렬
             List<Comment> sortedCommentList = commentRepository.findAllByPostIdOrderByCreatedAtDesc(post.getId());
@@ -68,7 +68,6 @@ public class PostServiceImpl implements PostService{
     @Override
     public ResponseEntity<RestApiResponseDto> createPost(PostRequestDto requestDto, User user) {
         Post post = postRepository.save(new Post(requestDto, user));
-        log.info("게시글 저장 완료");
         return getRestApiResponseDtoResponseEntity( "게시글 작성 성공",HttpStatus.OK,new PostResponseDto(post));
     }
 
@@ -76,51 +75,25 @@ public class PostServiceImpl implements PostService{
     // 4. 게시글 수정
     @Transactional
     @Override
-    public ResponseEntity<RestApiResponseDto> updatePost(Long id, PostRequestDto requestDto, User user) {
-        // 1. 해당 게시글이 있는지 확인
-        Post post = postRepository.findById(id).orElseThrow(() ->
-                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
-
-        // 2. 해당 게시글의 작성자라면 수정하도록 함.
-        Long inputId = post.getUser().getId(); // 게시글의 작성자 user_id
-        Long loginId = user.getId(); // 로그인된 사용자 user_id
-
-        if (!inputId.equals(loginId) && !user.getRole().equals(UserRoleEnum.ADMIN)) {
-            throw new IllegalArgumentException("작성자 혹은 관리자만 삭제/수정 할 수 있습니다.");
-        }// the end of if()
-
+    public ResponseEntity<RestApiResponseDto> updatePost(Post post,PostRequestDto requestDto, User user) {
         post.update(requestDto);
-        log.info("게시글 수정 완료");
         return getRestApiResponseDtoResponseEntity( "게시글 수정 성공",HttpStatus.OK,new PostResponseDto(post));
     }
 
 
     // 5. 게시글 삭제
     @Override
-    public ResponseEntity<RestApiResponseDto> deletePost(Long id, User user) {
-        // 1. 해당 게시글이 있는지 확인
-        Post post = postRepository.findById(id).orElseThrow(() ->
-                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
-
-        // 2. 해당 게시글의 작성자라면 수정하도록 함.
-        Long inputId = post.getUser().getId();// 게시글의 user_id
-        Long loginId = user.getId(); // 로그인된 user_id
-
-        if (!inputId.equals(loginId) && !user.getRole().equals(UserRoleEnum.ADMIN)) {
-            throw new IllegalArgumentException("작성자 혹은 관리자만 삭제/수정 할 수 있습니다.");
-        }// the end of if()
-
-        // 해당 게시글에 해당하는 좋아요 데이터 삭제
-        List<PostLike> likeList = postLikeRepository.findByPostId(id);
-        postLikeRepository.deleteAll(likeList);
-
-        // 해당 게시글 삭제
+    public ResponseEntity<RestApiResponseDto> deletePost(Post post, User user) {
         postRepository.delete(post);
-        log.info("게시글 삭제 완료");
-
         return getRestApiResponseDtoResponseEntity( "게시글 삭제 성공",HttpStatus.OK,null);
     }
 
+
+
+    public Post findByPost(Long id) {
+        return postRepository.findById(id).orElseThrow(() ->
+                new PostNotFoundException("해당 게시글이 존재하지 않습니다."));
+    }
 
     @Override
     public ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(

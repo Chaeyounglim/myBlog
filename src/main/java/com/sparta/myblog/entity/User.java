@@ -1,6 +1,7 @@
 package com.sparta.myblog.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @NoArgsConstructor
+@EqualsAndHashCode
 @Table(name = "users")
 public class User {
 

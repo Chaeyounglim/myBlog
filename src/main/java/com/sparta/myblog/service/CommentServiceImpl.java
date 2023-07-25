@@ -3,7 +3,9 @@ package com.sparta.myblog.service;
 import com.sparta.myblog.dto.CommentRequestDto;
 import com.sparta.myblog.dto.CommentResponseDto;
 import com.sparta.myblog.dto.RestApiResponseDto;
-import com.sparta.myblog.entity.*;
+import com.sparta.myblog.entity.Comment;
+import com.sparta.myblog.entity.Post;
+import com.sparta.myblog.entity.User;
 import com.sparta.myblog.exception.CommentNotFoundException;
 import com.sparta.myblog.exception.PostNotFoundException;
 import com.sparta.myblog.repository.CommentLikeRepository;
@@ -15,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -51,8 +51,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public ResponseEntity<RestApiResponseDto> updateComment(
-            Long commentId, CommentRequestDto requestDto, User user){
-        // 1. 해당하는 댓글 가져오기
+            Comment comment, CommentRequestDto requestDto, User user){
+/*        // 1. 해당하는 댓글 가져오기
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException("해당 댓글이 존재하지 않습니다."));
 
@@ -63,21 +63,21 @@ public class CommentServiceImpl implements CommentService {
         if (!commentUserId.equals(user.getId()) && !user.getRole().equals(UserRoleEnum.ADMIN)) { // 작성자가 아닐 경우
             log.error("댓글 작성자가 아닌 사용자가 댓글 수정 요청");
             throw new IllegalArgumentException("작성자 혹은 관리자만 삭제/수정 할 수 있습니다.");
-        } // the end of if()
-
+        } // the end of if()*/
         // 4. 해당 댓글 수정하기
+        log.info("service" + comment.getId());
+        log.info("service" + user.getId());
         comment.update(requestDto);
-        log.info("댓글 수정 완료");
-
+        log.info("service에서 저장 후" + comment.getId());
         return getRestApiResponseDtoResponseEntity("댓글 수정 성공",HttpStatus.OK, new CommentResponseDto(comment));
     }
 
 
     // 댓글 삭제하기
     @Override
-    public ResponseEntity<RestApiResponseDto> deleteComment(Long commentId, User user) {
-        // 1. 해당하는 댓글 가져오기
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+    public ResponseEntity<RestApiResponseDto> deleteComment(Comment comment, User user) {
+/*        // 1. 해당하는 댓글 가져오기
+        Comment comment = findById();commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentNotFoundException("해당 댓글이 존재하지 않습니다."));
 
         // 2. 댓글 작성자 이름 가져오기
@@ -91,13 +91,18 @@ public class CommentServiceImpl implements CommentService {
 
         // 4. 해당 댓글에 해당하는 좋아요 데이터 삭제
         List<CommentLike> likeList = commentLikeRepository.findByCommentId(commentId);
-        commentLikeRepository.deleteAll(likeList);
-
+        commentLikeRepository.deleteAll(likeList);*/
         // 5. 해당 댓글 삭제하기
+        log.info("service");
         commentRepository.delete(comment);
-        log.info("댓글 삭제 완료");
-
         return getRestApiResponseDtoResponseEntity("댓글 삭제 성공",HttpStatus.OK,null);
+    }
+
+    @Override
+    public Comment findById(Long id){
+        log.info(String.valueOf(id));
+        return commentRepository.findById(id).orElseThrow(() ->
+                new CommentNotFoundException("해당 댓글이 존재하지 않습니다."));
     }
 
     @Override

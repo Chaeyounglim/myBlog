@@ -4,15 +4,18 @@ package com.sparta.myblog.controller;
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.dto.RestApiResponseDto;
+import com.sparta.myblog.entity.Post;
 import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
 import com.sparta.myblog.service.PostServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 
 @RequestMapping("/api")
@@ -52,8 +55,12 @@ public class PostController {
             @PathVariable Long id,
             @RequestBody PostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        this.tokenValidate(userDetails);
-        return postService.updatePost(id, requestDto, userDetails.getUser());
+        try{
+            Post post = postService.findByPost(id);
+            return postService.updatePost(post, requestDto, userDetails.getUser());
+        }catch (RejectedExecutionException e){
+            return ResponseEntity.badRequest().body(new RestApiResponseDto(HttpStatus.BAD_REQUEST.value(),"작성자만 수정 할 수 있습니다.",null));
+        }
     }
 
 
@@ -62,8 +69,12 @@ public class PostController {
     public ResponseEntity<RestApiResponseDto> deletePost(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        this.tokenValidate(userDetails);
-        return postService.deletePost(id, userDetails.getUser());
+        try{
+            Post post = postService.findByPost(id);
+            return postService.deletePost(post, userDetails.getUser());
+        }catch (RejectedExecutionException e){
+            return ResponseEntity.badRequest().body(new RestApiResponseDto(HttpStatus.BAD_REQUEST.value(),"작성자만 삭제 할 수 있습니다.",null));
+        }
     }
 
     public void tokenValidate(UserDetailsImpl userDetails) {
