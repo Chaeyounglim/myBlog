@@ -8,7 +8,6 @@ import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @Table(name="comment_like")
 @NoArgsConstructor
 public class CommentLike {
