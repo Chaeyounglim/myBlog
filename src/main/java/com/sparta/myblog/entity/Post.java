@@ -4,17 +4,12 @@ import com.sparta.myblog.dto.PostRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@Setter
-@DynamicInsert
 @Table(name = "posts")
 @NoArgsConstructor
 public class Post extends Timestamped {
@@ -25,25 +20,24 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String title;
 
-    @ColumnDefault("0")
-    private Long likeCount;
+    @Column(nullable = false, length = 500)
+    private String contents;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, length = 500)
-    private String contents;
-
-    @OneToMany( mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany( mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<PostLike> postLikeList = new ArrayList<>();
 
 
     public Post(PostRequestDto requestDto, User user) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
         this.user = user;
-        this.likeCount = Long.getLong("0");
     }
 
     public void addComment(Comment comment) {
@@ -53,14 +47,6 @@ public class Post extends Timestamped {
     public void update(PostRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
-    }
-
-    public void increaseLike(){
-        this.likeCount++;
-    }
-
-    public void decreaseLike(){
-        this.likeCount--;
     }
 
 }

@@ -41,17 +41,15 @@ public class CommentLikeService {
             else {
                 CommentLike like = checkLike.get();
                 like.changeLiked();
-                comment.increaseLike();
             }
         }// 3. 댓글 데이터가 없을 경우
         else {
             CommentLike like = new CommentLike(user,comment);
             likeRepository.save(like);
-            comment.increaseLike();
         }
 
         return getRestApiResponseDtoResponseEntity(
-                "좋아요 성공", HttpStatus.OK);
+                "좋아요 성공", HttpStatus.OK,null);
     }
 
     @Transactional
@@ -68,7 +66,6 @@ public class CommentLikeService {
             if(checkLike.get().isLiked()){
                 CommentLike like = checkLike.get();
                 like.changeLiked();
-                comment.decreaseLike();
             } // 2-2. false 로 저장되어 있을 경우
             else {
                 throw new IllegalArgumentException("좋아요 감소가 중복되었습니다.");
@@ -77,12 +74,12 @@ public class CommentLikeService {
             throw new IllegalArgumentException("해당 좋아요에 대한 데이터가 없습니다.");
         }
         return getRestApiResponseDtoResponseEntity(
-                "좋아요 취소 성공",HttpStatus.OK);
+                "좋아요 취소 성공",HttpStatus.OK,null);
     }
 
     private ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(
-            String message, HttpStatus status) {
-        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(status.value(), message);
+            String message, HttpStatus status, Object result) {
+        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(status.value(), message,result);
         return new ResponseEntity<>(
                 restApiResponseDto,
                 status

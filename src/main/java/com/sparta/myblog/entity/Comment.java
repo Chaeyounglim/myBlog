@@ -5,13 +5,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
-@DynamicInsert
 @Table(name="comments")
 @NoArgsConstructor
 public class Comment extends Timestamped{
@@ -22,9 +22,6 @@ public class Comment extends Timestamped{
     @Column(nullable = false)
     private String contents;
 
-    @ColumnDefault("0")
-    private Long likeCnt;
-
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
@@ -33,19 +30,17 @@ public class Comment extends Timestamped{
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Comment(CommentRequestDto requestDto) {
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
+    private List<CommentLike> commentLikeList = new ArrayList<>();
+
+    public Comment(CommentRequestDto requestDto, Post post, User user) {
         this.contents = requestDto.getContents();
+        this.post = post;
+        this.user = user;
     }
 
     public void update(CommentRequestDto requestDto) {
         this.contents = requestDto.getContents();
     }
 
-    public void increaseLike() {
-        this.likeCnt++;
-    }
-
-    public void decreaseLike() {
-        this.likeCnt--;
-    }
 }

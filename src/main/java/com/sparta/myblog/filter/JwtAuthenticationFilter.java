@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private void responseResult(HttpServletResponse res, HttpStatus status, String message) throws IOException {
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-        RestApiResponseDto dto = new RestApiResponseDto(status.value(), message);
+        RestApiResponseDto dto = new RestApiResponseDto(status.value(), message,null);
         ObjectMapper objectMapper = new ObjectMapper();
         res.getWriter().write(objectMapper.writeValueAsString(dto));
     }

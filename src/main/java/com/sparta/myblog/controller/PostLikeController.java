@@ -16,7 +16,7 @@ public class PostLikeController {
 
     private final PostLikeService likeService;
 
-    @PostMapping("/post/{post_id}/like")
+    @PostMapping("/posts/{post_id}/like")
     public ResponseEntity<RestApiResponseDto> increaseLike(
             @PathVariable Long post_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -25,7 +25,7 @@ public class PostLikeController {
     }
 
 
-    @PutMapping("/post/{post_id}/like")
+    @PutMapping("/posts/{post_id}/dislike")
     public ResponseEntity<RestApiResponseDto> decreaseLike(
             @PathVariable Long post_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {

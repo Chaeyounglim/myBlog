@@ -41,17 +41,15 @@ public class PostLikeService {
                 // liked 필드가 false 일 경우
                 PostLike like = checkLike.get();
                 like.changeLiked();
-                post.increaseLike();
             }
         } // 3-2. likes 테이블에 없을 경우
         else {
             PostLike like = new PostLike(user,post); // user_id , post_id , liked 데이터를 추가
             likeRepository.save(like); // DB table 에 저장.
-            post.increaseLike(); // post table 에서도 likeCnt 증가 (Transaction 환경이여야 함)
         }
 
         return getRestApiResponseDtoResponseEntity(
-                "좋아요 성공", HttpStatus.OK);
+                "좋아요 성공", HttpStatus.OK,null);
     }
 
 
@@ -69,7 +67,6 @@ public class PostLikeService {
             if(checkLike.get().isLiked()){ // liked 칼럼이 true 일 경우
                 PostLike like = checkLike.get();
                 like.changeLiked(); // true 값을 false 로 변경
-                post.decreaseLike(); // post table 에서도 likeCnt 감소 (Transaction 환경이여야 함)
             }else{ // liked 칼럼이 false 일 경우
                 throw new IllegalArgumentException("좋아요 감소가 중복되었습니다.");
 /*                return getRestApiResponseDtoResponseEntity(
@@ -81,14 +78,14 @@ public class PostLikeService {
                     "좋아요 취소 실패: 좋아요를 누른 적이 없습니다.", HttpStatus.NOT_FOUND);*/
         }
         return getRestApiResponseDtoResponseEntity(
-                "좋아요 취소 성공",HttpStatus.OK);
+                "좋아요 취소 성공",HttpStatus.OK,null);
     }
 
 
 
     private ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(
-            String message,HttpStatus status) {
-        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(status.value(),message);
+            String message,HttpStatus status, Object result) {
+        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(status.value(),message,result);
         return new ResponseEntity<>(
                 restApiResponseDto,
                 status

@@ -17,7 +17,7 @@ public class CommentLikeController {
 
     private final CommentLikeService commentLikeService;
 
-    @PostMapping("/comment/{comment_id}/like")
+    @PostMapping("/comments/{comment_id}/like")
     public ResponseEntity<RestApiResponseDto> increaseLike(
             @PathVariable Long comment_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -25,7 +25,7 @@ public class CommentLikeController {
         return commentLikeService.increaseLike(comment_id,userDetails.getUser());
     }
 
-    @PutMapping("/comment/{comment_id}/like")
+    @PutMapping("/comments/{comment_id}/dislike")
     public ResponseEntity<RestApiResponseDto> decreaseLike(
             @PathVariable Long comment_id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {

@@ -3,11 +3,13 @@ package com.sparta.myblog.controller;
 
 import com.sparta.myblog.dto.PostRequestDto;
 import com.sparta.myblog.dto.PostResponseDto;
+import com.sparta.myblog.dto.RestApiResponseDto;
 import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
 import com.sparta.myblog.service.PostService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +39,8 @@ public class PostController {
 
 
     // 게시글 작성
-    @PostMapping("/post")
-    public PostResponseDto createPost(
+    @PostMapping("/posts")
+    public ResponseEntity<RestApiResponseDto> createPost(
             @RequestBody PostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         this.tokenValidate(userDetails);
@@ -47,8 +49,8 @@ public class PostController {
 
 
     // 선택한 게시글 수정
-    @PutMapping("/post/{id}")
-    public PostResponseDto updatePost(
+    @PutMapping("/posts/{id}")
+    public ResponseEntity<RestApiResponseDto> updatePost(
             @PathVariable Long id,
             @RequestBody PostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -58,13 +60,13 @@ public class PostController {
 
 
     // 선택한 게시글 삭제
-    @DeleteMapping("/post/{id}")
-    public void deletePost(
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<RestApiResponseDto> deletePost(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             HttpServletResponse res) throws IOException {
         this.tokenValidate(userDetails);
-        postService.deletePost(res, id, userDetails.getUser());
+        return postService.deletePost(res, id, userDetails.getUser());
     }
 
     public void tokenValidate(UserDetailsImpl userDetails) {

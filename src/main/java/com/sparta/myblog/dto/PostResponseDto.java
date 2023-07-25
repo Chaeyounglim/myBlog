@@ -3,14 +3,12 @@ package com.sparta.myblog.dto;
 import com.sparta.myblog.entity.Comment;
 import com.sparta.myblog.entity.Post;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 public class PostResponseDto {
 
     private Long id;
@@ -19,8 +17,8 @@ public class PostResponseDto {
     private String contents;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-    private Long likeCnt;
-    private List<CommentResponseDto> commentResponseDtoList;
+    private int likeCnt;
+    private List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -29,8 +27,7 @@ public class PostResponseDto {
         this.contents = post.getContents();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
-        this.likeCnt = post.getLikeCount();
-        this.commentResponseDtoList = new ArrayList<>();
+        this.likeCnt = post.getPostLikeList().size();
         if(post.getCommentList().size()>0) {
             for (Comment comment : post.getCommentList()) {
                 this.commentResponseDtoList.add(new CommentResponseDto(comment));
