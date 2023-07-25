@@ -4,7 +4,7 @@ package com.sparta.myblog.controller;
 import com.sparta.myblog.dto.RestApiResponseDto;
 import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
-import com.sparta.myblog.service.CommentLikeService;
+import com.sparta.myblog.service.CommentLikeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class CommentLikeController {
 
-    private final CommentLikeService commentLikeService;
+    private final CommentLikeServiceImpl commentLikeService;
 
     @PostMapping("/comments/{comment_id}/like")
     public ResponseEntity<RestApiResponseDto> increaseLike(

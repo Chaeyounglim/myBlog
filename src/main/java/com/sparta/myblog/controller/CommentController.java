@@ -4,21 +4,18 @@ import com.sparta.myblog.dto.CommentRequestDto;
 import com.sparta.myblog.dto.RestApiResponseDto;
 import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
-import com.sparta.myblog.service.CommentService;
-import jakarta.servlet.http.HttpServletResponse;
+import com.sparta.myblog.service.CommentServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentServiceImpl commentService;
 
     @PostMapping("/comments")
     public ResponseEntity<RestApiResponseDto> createComment(
@@ -33,20 +30,18 @@ public class CommentController {
     public ResponseEntity<RestApiResponseDto> updateComment(
             @PathVariable Long comment_id,
             @RequestBody CommentRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            HttpServletResponse response) throws IOException {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         this.tokenValidate(userDetails);
-        return commentService.updateComment(response,comment_id,requestDto,userDetails.getUser());
+        return commentService.updateComment(comment_id,requestDto,userDetails.getUser());
     }
 
 
     @DeleteMapping("/comments/{comment_id}")
     public ResponseEntity<RestApiResponseDto> updateComment(
             @PathVariable Long comment_id,
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            HttpServletResponse res) throws IOException {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         this.tokenValidate(userDetails);
-        return commentService.deleteComment(res,comment_id,userDetails.getUser());
+        return commentService.deleteComment(comment_id,userDetails.getUser());
     }
 
     public void tokenValidate(UserDetailsImpl userDetails) {

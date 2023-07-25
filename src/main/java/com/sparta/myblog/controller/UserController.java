@@ -2,7 +2,7 @@ package com.sparta.myblog.controller;
 
 
 import com.sparta.myblog.dto.UserRequestDto;
-import com.sparta.myblog.service.UserService;
+import com.sparta.myblog.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final MessageSource messageSource;
 
     // 회원가입

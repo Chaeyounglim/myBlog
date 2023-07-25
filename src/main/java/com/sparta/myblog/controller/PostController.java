@@ -6,14 +6,12 @@ import com.sparta.myblog.dto.PostResponseDto;
 import com.sparta.myblog.dto.RestApiResponseDto;
 import com.sparta.myblog.exception.TokenNotValidateException;
 import com.sparta.myblog.security.UserDetailsImpl;
-import com.sparta.myblog.service.PostService;
-import jakarta.servlet.http.HttpServletResponse;
+import com.sparta.myblog.service.PostServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 
@@ -22,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
 
-    private final PostService postService;
+    private final PostServiceImpl postService;
 
     // 전체 게시글 목록 조회
     @GetMapping("/posts")
@@ -63,10 +61,9 @@ public class PostController {
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<RestApiResponseDto> deletePost(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            HttpServletResponse res) throws IOException {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         this.tokenValidate(userDetails);
-        return postService.deletePost(res, id, userDetails.getUser());
+        return postService.deletePost(id, userDetails.getUser());
     }
 
     public void tokenValidate(UserDetailsImpl userDetails) {

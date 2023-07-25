@@ -1,89 +1,37 @@
 package com.sparta.myblog.service;
 
 import com.sparta.myblog.dto.RestApiResponseDto;
-import com.sparta.myblog.entity.Comment;
-import com.sparta.myblog.entity.CommentLike;
 import com.sparta.myblog.entity.User;
-import com.sparta.myblog.exception.CommentNotFoundException;
-import com.sparta.myblog.repository.CommentLikeRepository;
-import com.sparta.myblog.repository.CommentRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+public interface CommentLikeService {
 
-@Service
-@RequiredArgsConstructor
-public class CommentLikeService {
+    /**
+     * 댓글 좋아요 증가
+     * @param id 댓글 식별자
+     * @param user 댓글 입력한 유저
+     * @return 상태 코드 및 메시지
+     */
+    ResponseEntity<RestApiResponseDto> increaseLike(Long id, User user);
 
-    private final CommentLikeRepository likeRepository;
-    private final CommentRepository commentRepository;
+
+    /**
+     * 댓글 좋아요 취소
+     * @param id 댓글 식별자
+     * @param user 댓글 입력한 유저
+     * @return 상태 코드 및 메시지
+     */
+    ResponseEntity<RestApiResponseDto> decreaseLike(Long id, User user);
 
 
-    @Transactional
-    public ResponseEntity<RestApiResponseDto> increaseLike(Long id, User user) {
-        // 1. 댓글 가져오기
-        Comment comment = commentRepository.findById(id).orElseThrow(() ->
-                new CommentNotFoundException("해당 댓글이 존재하지 않습니다."));
-
-        // 2. 댓글 데이터가 있을 경우
-        Optional<CommentLike> checkLike = likeRepository.findByUserIdAndCommentId(user.getId(), comment.getId());
-
-        if(checkLike.isPresent()){
-            // 2-1. 댓글 데이터가 true 일 경우
-            if(checkLike.get().isLiked()) {
-                throw new IllegalArgumentException("좋아요 증가가 중복되었습니다.");
-            }
-            // 2-2. 댓글 데이터가 false 일 경우
-            else {
-                CommentLike like = checkLike.get();
-                like.changeLiked();
-            }
-        }// 3. 댓글 데이터가 없을 경우
-        else {
-            CommentLike like = new CommentLike(user,comment);
-            likeRepository.save(like);
-        }
-
-        return getRestApiResponseDtoResponseEntity(
-                "좋아요 성공", HttpStatus.OK,null);
-    }
-
-    @Transactional
-    public ResponseEntity<RestApiResponseDto> decreaseLike(Long id, User user) {
-        // 1. 해당 댓글이 있는지
-        Comment comment = commentRepository.findById(id).orElseThrow(() ->
-                new CommentNotFoundException("해당 댓글이 존재하지 않습니다."));
-
-        // 2. 좋아요 데이터가 있는지
-        Optional<CommentLike> checkLike = likeRepository.findByUserIdAndCommentId(user.getId(),comment.getId());
-
-        if(checkLike.isPresent()){
-            // 2-1. true 로 저장되어 있을 경우
-            if(checkLike.get().isLiked()){
-                CommentLike like = checkLike.get();
-                like.changeLiked();
-            } // 2-2. false 로 저장되어 있을 경우
-            else {
-                throw new IllegalArgumentException("좋아요 감소가 중복되었습니다.");
-            }
-        }else {
-            throw new IllegalArgumentException("해당 좋아요에 대한 데이터가 없습니다.");
-        }
-        return getRestApiResponseDtoResponseEntity(
-                "좋아요 취소 성공",HttpStatus.OK,null);
-    }
-
-    private ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(
-            String message, HttpStatus status, Object result) {
-        RestApiResponseDto restApiResponseDto = new RestApiResponseDto(status.value(), message,result);
-        return new ResponseEntity<>(
-                restApiResponseDto,
-                status
-        );
-    }
-
+    /**
+     * 반환 메소드
+     * @param message 반환할 메시지
+     * @param status 응답 코드
+     * @param result 응답 데이터
+     * @return 위의 정보들을 ResponseEntity 클래스에 담아서 반환
+     */
+    ResponseEntity<RestApiResponseDto> getRestApiResponseDtoResponseEntity(
+            String message, HttpStatus status, Object result);
 }
